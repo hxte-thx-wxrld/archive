@@ -1,0 +1,50 @@
+services:
+  frontend:
+    restart: always
+    depends_on:
+      - db
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+    environment:
+      PG_URL: postgres://pguser:pgpassword@db:5432/pguser?search_path=public
+    volumes:
+      - "./.env:/.env"
+  weed:
+    image: chrislusf/seaweedfs # use a remote image
+    restart: always
+    ports:
+      - 8333:8333
+    command: "server -dir=/data -s3 -idleTimeout=30"
+    volumes:
+      #- "/mnt/hdd/seaweed:/data"
+      - "./appdata/seaweed:/data"
+      - "./s3.json:/etc/seaweedfs/config.json"
+#      - "./filer.toml:/etc/seaweedfs/filer.toml"
+
+# Use postgres/example user/password credentials
+  db:
+    image: postgres
+#    network_mode: host
+    restart: always
+    # set shared memory limit when using docker compose
+    shm_size: 128mb
+    # or set shared memory limit when deploy via swarm stack
+    volumes:
+      - "./db/base.sql:/docker-entrypoint-initdb.d/base.sql"
+      - ./appdata/postgres:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: netstat -ltn | grep -c 9083
+      interval: 2s
+    #volumes:
+    #  - type: tmpfs
+    #    target: /dev/shm
+    #    tmpfs:
+    #      size: 134217728 # 128*2^20 bytes = 128Mb
+    environment:
+      POSTGRES_PASSWORD: pgpassword
+      POSTGRES_USER: pguser
