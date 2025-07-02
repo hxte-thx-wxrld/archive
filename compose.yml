@@ -21,7 +21,7 @@ services:
     volumes:
       #- "/mnt/hdd/seaweed:/data"
       - "./appdata/seaweed:/data"
-      - "./s3.json:/etc/seaweedfs/config.json"
+      #- "./s3.json:/etc/seaweedfs/config.json"
 #      - "./filer.toml:/etc/seaweedfs/filer.toml"
 
 # Use postgres/example user/password credentials
@@ -48,3 +48,12 @@ services:
     environment:
       POSTGRES_PASSWORD: pgpassword
       POSTGRES_USER: pguser
+
+  daemon:
+    build:
+      context: .
+      dockerfile: Dockerfile.daemon
+    container_name: crontab
+    environment:
+      #CRON_SAMPLE: '* * * * * echo 1 minute cron'
+      CRON_ANOTHER_SAMPLE: '0 2 * * * python3 /app/sync_s3.py'

@@ -1,0 +1,5 @@
+FROM tinslice/crontab
+RUN apk add postgresql postgresql-libs postgresql-dev python3-dev gcc musl-dev linux-headers
+WORKDIR /app
+COPY ./daemon .
+RUN pip3 install -r requirements.txt
