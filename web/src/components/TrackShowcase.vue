@@ -1,10 +1,11 @@
 <script lang="ts">
 import { useRouter, useRoute } from 'vue-router'
+import { getDevPrefix } from '../main'
 
 export default {
     props: ['trackId'],
     async setup(props) {
-        const req = await fetch("http://localhost:8080/api/track/" + props.trackId)
+        const req = await fetch(getDevPrefix() + "/api/track/" + props.trackId)
         const data = await req.json()
 
         console.log(data)

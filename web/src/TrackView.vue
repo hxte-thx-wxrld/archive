@@ -5,12 +5,15 @@ import BrowseList from './components/TrackList.vue'
 
 <script lang="ts">
 export default {
-
+    methods: {
+        
+    }
 }
 </script>
 
 <template>
     <h1>Tracks</h1>
+    <div class=""><button type="button" @click.prevent="">+</button></div>
     <Suspense>
         <BrowseList />
         <template #fallback>

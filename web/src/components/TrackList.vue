@@ -1,9 +1,10 @@
 <script lang="ts">
+import { getDevPrefix } from '../main'
 import MockTracks from '../mock/all_tracks.json'
 
 export default {
     async setup() {
-        const req = await fetch("http://localhost:8080/api/track/")
+        const req = await fetch(getDevPrefix() + "/api/track/")
         const data = await req.json()
 
         console.log(data)

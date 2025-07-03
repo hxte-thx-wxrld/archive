@@ -5,8 +5,6 @@
 -- Dumped from database version 17.5 (Debian 17.5-1.pgdg120+1)
 -- Dumped by pg_dump version 17.5 (Homebrew)
 
--- Started on 2025-07-02 23:40:21 CEST
-
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
@@ -19,8 +17,32 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
+ALTER TABLE IF EXISTS ONLY public.music_in_releases DROP CONSTRAINT IF EXISTS music_in_releases_releases_fk;
+ALTER TABLE IF EXISTS ONLY public.music_in_releases DROP CONSTRAINT IF EXISTS music_in_releases_music_fk;
+ALTER TABLE IF EXISTS ONLY public.music DROP CONSTRAINT IF EXISTS music_artists_fk;
+DROP TRIGGER IF EXISTS trigger_set_catalog_id ON public.releases;
+DROP INDEX IF EXISTS public.music_filepath_idx;
+ALTER TABLE IF EXISTS ONLY public.releases DROP CONSTRAINT IF EXISTS releases_unique;
+ALTER TABLE IF EXISTS ONLY public.releases DROP CONSTRAINT IF EXISTS releases_pk;
+ALTER TABLE IF EXISTS ONLY public.music DROP CONSTRAINT IF EXISTS music_pk;
+ALTER TABLE IF EXISTS ONLY public.music_in_releases DROP CONSTRAINT IF EXISTS music_in_releases_unique;
+ALTER TABLE IF EXISTS ONLY public.music_in_releases DROP CONSTRAINT IF EXISTS music_in_releases_pk;
+ALTER TABLE IF EXISTS ONLY public.interpret DROP CONSTRAINT IF EXISTS artists_unique;
+ALTER TABLE IF EXISTS ONLY public.interpret DROP CONSTRAINT IF EXISTS artists_pk;
+ALTER TABLE IF EXISTS public.music_in_releases ALTER COLUMN id DROP DEFAULT;
+DROP SEQUENCE IF EXISTS public.music_in_releases_id_seq;
+DROP VIEW IF EXISTS public.all_tracks;
+DROP VIEW IF EXISTS public.published;
+DROP TABLE IF EXISTS public.releases;
+DROP TABLE IF EXISTS public.music_in_releases;
+DROP TABLE IF EXISTS public.music;
+DROP TABLE IF EXISTS public.interpret;
+DROP FUNCTION IF EXISTS public.set_catalog_id();
+DROP FUNCTION IF EXISTS public.create_catalog_id(id uuid);
+DROP TYPE IF EXISTS public.release_type;
+DROP EXTENSION IF EXISTS pgcrypto;
+-- *not* dropping schema, since initdb creates it
 --
--- TOC entry 6 (class 2615 OID 16734)
 -- Name: public; Type: SCHEMA; Schema: -; Owner: -
 --
 
@@ -28,8 +50,6 @@ SET row_security = off;
 
 
 --
--- TOC entry 3457 (class 0 OID 0)
--- Dependencies: 6
 -- Name: SCHEMA public; Type: COMMENT; Schema: -; Owner: -
 --
 
@@ -37,7 +57,6 @@ COMMENT ON SCHEMA public IS '';
 
 
 --
--- TOC entry 2 (class 3079 OID 16805)
 -- Name: pgcrypto; Type: EXTENSION; Schema: -; Owner: -
 --
 
@@ -45,8 +64,6 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;
 
 
 --
--- TOC entry 3458 (class 0 OID 0)
--- Dependencies: 2
 -- Name: EXTENSION pgcrypto; Type: COMMENT; Schema: -; Owner: -
 --
 
@@ -54,7 +71,6 @@ COMMENT ON EXTENSION pgcrypto IS 'cryptographic functions';
 
 
 --
--- TOC entry 891 (class 1247 OID 16736)
 -- Name: release_type; Type: TYPE; Schema: public; Owner: -
 --
 
@@ -66,7 +82,6 @@ CREATE TYPE public.release_type AS ENUM (
 
 
 --
--- TOC entry 271 (class 1255 OID 16873)
 -- Name: create_catalog_id(uuid); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -80,7 +95,6 @@ $$;
 
 
 --
--- TOC entry 273 (class 1255 OID 16874)
 -- Name: set_catalog_id(); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -99,7 +113,6 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
--- TOC entry 218 (class 1259 OID 16743)
 -- Name: interpret; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -112,7 +125,6 @@ CREATE TABLE public.interpret (
 
 
 --
--- TOC entry 219 (class 1259 OID 16751)
 -- Name: music; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -128,7 +140,6 @@ CREATE TABLE public.music (
 
 
 --
--- TOC entry 220 (class 1259 OID 16759)
 -- Name: music_in_releases; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -141,7 +152,6 @@ CREATE TABLE public.music_in_releases (
 
 
 --
--- TOC entry 221 (class 1259 OID 16762)
 -- Name: releases; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -158,7 +168,6 @@ CREATE TABLE public.releases (
 
 
 --
--- TOC entry 223 (class 1259 OID 16842)
 -- Name: published; Type: VIEW; Schema: public; Owner: -
 --
 
@@ -182,7 +191,6 @@ CREATE VIEW public.published AS
 
 
 --
--- TOC entry 224 (class 1259 OID 16848)
 -- Name: all_tracks; Type: VIEW; Schema: public; Owner: -
 --
 
@@ -205,7 +213,6 @@ CREATE VIEW public.all_tracks AS
 
 
 --
--- TOC entry 222 (class 1259 OID 16772)
 -- Name: music_in_releases_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -219,8 +226,6 @@ CREATE SEQUENCE public.music_in_releases_id_seq
 
 
 --
--- TOC entry 3459 (class 0 OID 0)
--- Dependencies: 222
 -- Name: music_in_releases_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
@@ -228,7 +233,6 @@ ALTER SEQUENCE public.music_in_releases_id_seq OWNED BY public.music_in_releases
 
 
 --
--- TOC entry 3280 (class 2604 OID 16773)
 -- Name: music_in_releases id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -236,7 +240,6 @@ ALTER TABLE ONLY public.music_in_releases ALTER COLUMN id SET DEFAULT nextval('p
 
 
 --
--- TOC entry 3287 (class 2606 OID 16775)
 -- Name: interpret artists_pk; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -245,7 +248,6 @@ ALTER TABLE ONLY public.interpret
 
 
 --
--- TOC entry 3289 (class 2606 OID 16777)
 -- Name: interpret artists_unique; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -254,7 +256,6 @@ ALTER TABLE ONLY public.interpret
 
 
 --
--- TOC entry 3294 (class 2606 OID 16779)
 -- Name: music_in_releases music_in_releases_pk; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -263,7 +264,6 @@ ALTER TABLE ONLY public.music_in_releases
 
 
 --
--- TOC entry 3296 (class 2606 OID 16781)
 -- Name: music_in_releases music_in_releases_unique; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -272,7 +272,6 @@ ALTER TABLE ONLY public.music_in_releases
 
 
 --
--- TOC entry 3292 (class 2606 OID 16783)
 -- Name: music music_pk; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -281,7 +280,6 @@ ALTER TABLE ONLY public.music
 
 
 --
--- TOC entry 3298 (class 2606 OID 16859)
 -- Name: releases releases_pk; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -290,7 +288,6 @@ ALTER TABLE ONLY public.releases
 
 
 --
--- TOC entry 3300 (class 2606 OID 16785)
 -- Name: releases releases_unique; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -299,7 +296,6 @@ ALTER TABLE ONLY public.releases
 
 
 --
--- TOC entry 3290 (class 1259 OID 16786)
 -- Name: music_filepath_idx; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -307,7 +303,6 @@ CREATE UNIQUE INDEX music_filepath_idx ON public.music USING btree (filepath);
 
 
 --
--- TOC entry 3304 (class 2620 OID 16877)
 -- Name: releases trigger_set_catalog_id; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -315,7 +310,6 @@ CREATE TRIGGER trigger_set_catalog_id BEFORE INSERT ON public.releases FOR EACH 
 
 
 --
--- TOC entry 3301 (class 2606 OID 16787)
 -- Name: music music_artists_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -324,7 +318,6 @@ ALTER TABLE ONLY public.music
 
 
 --
--- TOC entry 3302 (class 2606 OID 16792)
 -- Name: music_in_releases music_in_releases_music_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -333,7 +326,6 @@ ALTER TABLE ONLY public.music_in_releases
 
 
 --
--- TOC entry 3303 (class 2606 OID 16797)
 -- Name: music_in_releases music_in_releases_releases_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -341,10 +333,7 @@ ALTER TABLE ONLY public.music_in_releases
     ADD CONSTRAINT music_in_releases_releases_fk FOREIGN KEY (release_id) REFERENCES public.releases(id);
 
 
--- Completed on 2025-07-02 23:40:21 CEST
-
 --
 -- PostgreSQL database dump complete
 --
 
-CREATE extension pgcrypto;

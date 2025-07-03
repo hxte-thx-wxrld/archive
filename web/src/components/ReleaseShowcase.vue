@@ -1,10 +1,12 @@
 <script lang="ts">
+import { getDevPrefix } from '../main'
+
 
 export default {
     props: ['releaseId'],
     async setup(props) {
         console.log(props.releaseId)
-        const req = await fetch("http://localhost:8080/api/release/" + props.releaseId)
+        const req = await fetch(getDevPrefix() + "/api/release/" + props.releaseId)
         const data = await req.json()
 
         console.log(data)

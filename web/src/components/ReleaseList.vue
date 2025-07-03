@@ -1,9 +1,10 @@
 <script lang="ts">
+import { getDevPrefix } from '../main'
 import MockTracks from '../mock/all_tracks.json'
 
 export default {
     async setup() {
-        const req = await fetch("http://localhost:8080/api/release/")
+        const req = await fetch(getDevPrefix() + "/api/release/")
         const data = await req.json()
 
         console.log(data)
@@ -20,7 +21,7 @@ export default {
 
 <template>
     <div class="browse-list">
-        <div class="row" v-for="(item, index) in data">
+        <div class="row" v-for="(item, index) in data" v-if="data != null">
             <div class="cover-area">
                 <img :src="'http://s3.rillo.internal:8333' + item.CoverUrl">
             </div>
@@ -38,6 +39,7 @@ export default {
                 </RouterLink>
             </div>
         </div>
+        <div v-else>No Data</div>
     </div>
 </template>
 

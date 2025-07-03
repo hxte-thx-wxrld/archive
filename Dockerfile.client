@@ -1,0 +1,6 @@
+FROM node AS client_builder
+WORKDIR /app
+COPY web .
+RUN yarn
+RUN yarn build
+CMD ["yarn", "dev", "--host"]

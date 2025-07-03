@@ -1,5 +1,5 @@
 services:
-  frontend:
+  backend:
     restart: always
     depends_on:
       - db
@@ -23,7 +23,7 @@ services:
     volumes:
       #- "/mnt/hdd/seaweed:/data"
       - "./appdata/seaweed:/data"
-      #- "./s3.json:/etc/seaweedfs/config.json"
+      - "./s3.json:/etc/seaweedfs/config.json"
 #      - "./filer.toml:/etc/seaweedfs/filer.toml"
 
 # Use postgres/example user/password credentials
@@ -35,8 +35,9 @@ services:
     shm_size: 128mb
     # or set shared memory limit when deploy via swarm stack
     volumes:
+      #- "./db/base.sql:/docker-entrypoint-initdb.d/0-base.sql"
       - "./db/base.sql:/docker-entrypoint-initdb.d/0-base.sql"
-      - "./db/data.sql:/docker-entrypoint-initdb.d/1-data.sql"
+      #- "./db/data.sql:/docker-entrypoint-initdb.d/1-data.sql"
       - ./appdata/postgres:/var/lib/postgresql/data
     ports:
       - "5432:5432"
