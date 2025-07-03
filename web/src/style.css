@@ -40,7 +40,6 @@ body {
 .showcase {
   display: grid;
   grid-template-columns: 256px 1fr;
-  margin: 4em 0;
 }
 
 .showcase .cover-area img {
