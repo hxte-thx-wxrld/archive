@@ -16,9 +16,11 @@ export default {
         <RouterLink to="/">
           <img class="logo" src="./assets/logo.png">
         </RouterLink>
-        <RouterLink class="action" to="/upload">
-          upload
-        </RouterLink>
+        <!--
+          <RouterLink class="action" to="/upload">
+            upload
+          </RouterLink>
+          -->
       </div>
       <div class="sub">
         <nav>
@@ -60,5 +62,8 @@ header .top {
 header .top .action {
   align-self:center;
   justify-self: end;
+}
+footer {
+  padding: 1em 0;
 }
 </style>

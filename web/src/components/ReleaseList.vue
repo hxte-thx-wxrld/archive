@@ -3,7 +3,7 @@ import MockTracks from '../mock/all_tracks.json'
 
 export default {
     async setup() {
-        const req = await fetch("http://localhost:8080/api/release")
+        const req = await fetch("http://localhost:8080/api/release/")
         const data = await req.json()
 
         console.log(data)

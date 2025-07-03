@@ -18,8 +18,6 @@ services:
     ports:
       - 8333:8333
     command: "server -dir=/data -s3 -idleTimeout=30"
-    healthcheck:
-      test: netstat -ltn | grep -c 8333
     volumes:
       #- "/mnt/hdd/seaweed:/data"
       - "./appdata/seaweed:/data"
@@ -35,13 +33,12 @@ services:
     shm_size: 128mb
     # or set shared memory limit when deploy via swarm stack
     volumes:
-      - "./db/base.sql:/docker-entrypoint-initdb.d/0-base.sql"
-      - "./db/data.sql:/docker-entrypoint-initdb.d/1-data.sql"
+      - "./db/base.sql:/docker-entrypoint-initdb.d/base.sql"
       - ./appdata/postgres:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     healthcheck:
-      test: netstat -ltn | grep -c 5432
+      test: netstat -ltn | grep -c 9083
       interval: 2s
     #volumes:
     #  - type: tmpfs

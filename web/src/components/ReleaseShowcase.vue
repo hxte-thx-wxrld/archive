@@ -25,16 +25,20 @@ export default {
             <div></div>
             <strong>Release Date:</strong><span>{{ data.ReleaseDate }}</span>
             <strong>Release-Code:</strong><span class="release-code">{{ data.CatalogId }}</span>
-            <strong>ISRC-Code:</strong><span>{{ data.Isrc }}</span>
+
+            <strong>ISRC-Code:</strong><span>{{ data.Isrc ?? "n. A."  }}</span>
             <span>Play: </span><a v-if="data.PublicUrl != null">Play</a><small v-else>stream not available</small>
             <h2>Track List</h2>
             <ol>
                 <li v-for="(music, index) in data.RelatedMusic">
                     <div>
                         <p>
+                            <a :href="'/track/' + music.TrackId">
                             <strong>
                                 {{ music.Name }}
+                                
                             </strong>
+                            </a>
                         </p>
                     </div>
                     <div>

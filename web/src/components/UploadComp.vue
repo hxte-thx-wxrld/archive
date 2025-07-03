@@ -2,13 +2,14 @@
 export default {
     data() {
         return {
-            active: false
+            active: false,
+            files: []
         }
     },
     methods: {
         setActive(event: DragEvent) {
             console.log(event)
-            debugger
+
             this.active = true
         },
         setInactive(_event: DragEvent) {
@@ -17,7 +18,7 @@ export default {
         },
         onDrop(event: DragEvent) {
             if (event.dataTransfer) {
-                console.log(event.dataTransfer.files)
+                this.files.push(...event.dataTransfer.files)
             }
             this.active = false
         }
@@ -29,6 +30,12 @@ export default {
     <div class="upload-box" :data-active="active" @dragenter.prevent="setActive" @dragover.prevent="setActive" @dragleave.prevent="setInactive" @drop.prevent="onDrop">
         
     </div>
+    <ul>
+        <li v-for="(file, index) in files">{{ file.name }}</li>
+    </ul>
+    <form>
+        
+    </form>
 </template>
 
 <style scoped>

@@ -347,3 +347,4 @@ ALTER TABLE ONLY public.music_in_releases
 -- PostgreSQL database dump complete
 --
 
+CREATE extension pgcrypto;

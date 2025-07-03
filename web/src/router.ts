@@ -8,6 +8,7 @@ import SingleArtistView from './SingleArtistView.vue'
 import TrackView from './TrackView.vue'
 import ReleasesView from './ReleasesView.vue'
 import ArtistView from './ArtistView.vue'
+import UploadView from './UploadView.vue'
 
 const routes = [
   { path: '/', component: HomeView },
@@ -18,6 +19,7 @@ const routes = [
   { path: '/release/:id', component: SingleReleasesView },
   { path: '/artist', component: ArtistView },
   { path: '/artist/:id', component: SingleArtistView },
+  { path: '/upload', component: UploadView },
 ]
 
 export const router = createRouter({

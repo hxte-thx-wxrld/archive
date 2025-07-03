@@ -25,12 +25,11 @@ func Serve(conn *pgx.Conn) {
 
 	defer conn.Close(context.Background())
 
+	r.Use(cors.Default())
 	dist, err := fs.Sub(f, "web/dist/assets")
 	if err != err {
 		log.Fatalln(err)
 	}
-
-	r.Use(cors.Default())
 
 	r.StaticFS("/assets", http.FS(dist))
 
@@ -39,6 +38,7 @@ func Serve(conn *pgx.Conn) {
 	})
 
 	ag := r.Group("/api")
+
 	api.InitApi(ag, conn)
 
 	r.Run(":8080")
