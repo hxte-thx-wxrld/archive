@@ -44,7 +44,7 @@ func GetMusicInReleases(db *pgx.Conn, releaseId string) ([]MusicInRelease, error
 }
 
 func GetAllReleases(db *pgx.Conn) ([]Release, error) {
-	sql := "select name, release_date::text, isrc, public_cover_url, id, catalog_id from releases"
+	sql := "select name, release_date::text, isrc, public_cover_url, id, catalog_id from releases order by release_date desc"
 	rows, err := db.Query(context.Background(), sql)
 	if err != nil {
 		return nil, err

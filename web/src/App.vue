@@ -40,8 +40,11 @@ export default {
 </template>
 
 <style scoped>
-.top .logo {
+header {
+    padding: 1em 0;
+}
 
+.top .logo {
   width: 50%;
 }
 
