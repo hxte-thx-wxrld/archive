@@ -7,10 +7,9 @@ import CatalogView from './views/CatalogView.vue'
 import SingleView from './views/SingleView.vue'
 
 const routes = [
-  { path: '/', component: HomeView },
   { path: '/about', component: AboutView },
   { path: '/upload', component: UploadView },
-  { path: '/catalog/:mode', component: CatalogView, alias: ["/catalog"] },
+  { path: '/catalog/:mode', component: CatalogView, alias: ["/catalog", "/"] },
   { path: '/catalog/:mode/:id', component: SingleView },
 ]
 

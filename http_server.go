@@ -7,6 +7,8 @@ import (
 	"net/http"
 
 	"github.com/gin-contrib/cors"
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 	"github.com/htw-archive/api"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -28,7 +30,10 @@ func Serve(conn *pgxpool.Pool) {
 
 	defer conn.Close()
 
+	store := cookie.NewStore(([]byte("secret")))
 	r.Use(cors.Default())
+	r.Use(sessions.Sessions("ui_session", store))
+
 	dist, err := fs.Sub(f, "web/dist/assets")
 	if err != err {
 		log.Fatalln(err)
@@ -38,6 +43,9 @@ func Serve(conn *pgxpool.Pool) {
 
 	r.GET("/:page", sendWebClient)
 	r.GET("/", sendWebClient)
+	/*r.GET("/login", func(c *gin.Context) {
+
+	})*/
 
 	ag := r.Group("/api")
 

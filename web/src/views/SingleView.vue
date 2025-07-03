@@ -21,7 +21,12 @@ export default {
 
 <template>
     <div v-if="getSubmode() == 'tracks'">
-        <h1>Track</h1>
+        <div class="mode-title-container">
+
+            <h1 class="mode-title inverted icon tracks">Track</h1>
+            <img class="back-icon" src="../assets/arrow.png">
+            <RouterLink to="/catalog/tracks">Back to Catalog</RouterLink>
+        </div>
         <Suspense>
             <TrackShowcase :track-id="getObjectId()" />
             <template #loading>
@@ -30,7 +35,12 @@ export default {
         </Suspense>
     </div>
     <div v-if="getSubmode() == 'releases'">
-        <h1>Release</h1>
+        <div class="mode-title-container">
+
+            <h1 class="mode-title inverted icon releases">Release</h1>
+            <img class="back-icon" src="../assets/arrow.png">
+            <RouterLink to="/catalog/releases">Back to Catalog</RouterLink>
+        </div>
         <Suspense>
             <ReleaseShowcase :release-id="getObjectId()" />
             <template #loading>
@@ -39,7 +49,11 @@ export default {
         </Suspense>
     </div>
     <div v-if="getSubmode() == 'artists'">
-        <h1>Artist</h1>
+        <div class="mode-title-container">
+            <h1 class="mode-title inverted icon artists">Artist</h1>
+            <img class="back-icon" src="../assets/arrow.png">
+            <RouterLink to="/catalog/artists">Back to Catalog</RouterLink>
+        </div>
         <Suspense>
             <ArtistShowcase :artist-id="getObjectId()" />
             <template #loading>
@@ -49,4 +63,25 @@ export default {
     </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.mode-title {
+    padding: 0
+}
+
+.mode-title-container {
+    padding-bottom: 2em;
+    margin-bottom: 2em;
+    border-bottom: 2px dashed white;
+}
+
+.back-icon {
+    filter: invert(1);
+    display: inline-block;
+    height: 1.5em;
+    rotate: 180deg;
+    padding: 0 .5em;
+
+    vertical-align: sub;
+
+}
+</style>

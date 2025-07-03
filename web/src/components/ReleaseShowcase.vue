@@ -21,6 +21,9 @@ export default {
     <div class="showcase">
         <div class="cover-area">
             <img :src="'http://s3.rillo.internal:8333' + data.CoverUrl">
+            <div class="barcode">
+                <vue-barcode :value="data.CatalogId" :options="{ displayValue: true }" tag="svg"></vue-barcode>
+            </div>
         </div>
         <div class="meta">
             <h1 class="title">{{ data.Name }}</h1>
@@ -35,7 +38,7 @@ export default {
                 <h2>Track List</h2>
                 <ol>
                     <li v-for="(music, index) in data.RelatedMusic">
-                        <a :href="'/track/' + music.TrackId">
+                        <a :href="'/catalog/tracks/' + music.TrackId">
                         <div>
                             <p>
                                     <strong>
@@ -58,6 +61,9 @@ export default {
 </template>
 
 <style scoped>
+.barcode svg {
+    width: 100%;
+}
 .showcase .cover-area img {}
 
 .showcase .meta {

@@ -25,9 +25,9 @@ export default {
 
             <h1 class="title">{{ data.Tracktitle }}</h1>
             <strong>Artist:</strong>
-            <RouterLink :to="'/artist/' + data.ArtistId">{{ data.Artist }}</RouterLink>
+            <RouterLink :to="'/catalog/artist/' + data.ArtistId">{{ data.Artist }}</RouterLink>
             <strong>Release-Code: </strong>
-            <a v-if="data.ReleaseId != null" class="release-code" :href="'/release/' + data.ReleaseId">{{ data.CatalogNo
+            <a v-if="data.ReleaseId != null" class="release-code" :href="'/catalog/release/' + data.ReleaseId">{{ data.CatalogNo
                 }}</a>
             <small v-else>no catalog release</small>
             <p>Play: </p>

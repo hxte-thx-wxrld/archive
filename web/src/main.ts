@@ -2,6 +2,7 @@ import { createApp } from 'vue'
 import './style.css'
 import App from './App.vue'
 import { router } from './router'
+import VueBarcode from '@chenfengyuan/vue-barcode';
 
 console.log(import.meta.env.MODE)
 export function getDevPrefix() {
@@ -11,4 +12,5 @@ export function getDevPrefix() {
 }
 createApp(App)
     .use(router)
+    .component(VueBarcode.name, VueBarcode)
     .mount('#app')

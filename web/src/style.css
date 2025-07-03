@@ -91,7 +91,12 @@ body {
   grid-template-columns: 256px 1fr;
 }
 
-.showcase .cover-area img {
+.showcase .cover-area {
+  display: flex;
+  flex-direction: column;
+}
+
+.showcase .cover-area img.cover {
   width: 256px;
   height: 256px;
   border: 1px solid white;
@@ -106,6 +111,28 @@ body {
 .showcase .meta .title {
   grid-column-start: 1;
   grid-column-end: 3;
+    padding: 0 0 1em 0;
+}
+
+.icon::before {
+    display: inline-block;
+    vertical-align:sub;
+    padding: 0 .5em;
+    width: 1em;
+    height: 1em;
+}
+
+.icon.tracks::before {
+    content: url(./assets/music.svg);
+}
+.icon.releases::before {
+    content: url(./assets/cd.svg);
+}
+.icon.artists::before {
+    content: url(./assets/artist.svg);
+}
+.icon.inverted::before {
+  filter: invert(1)
 }
 
 /* iphone */

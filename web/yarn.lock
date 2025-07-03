@@ -27,6 +27,11 @@
     "@babel/helper-string-parser" "^7.27.1"
     "@babel/helper-validator-identifier" "^7.27.1"
 
+"@chenfengyuan/vue-barcode@2":
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/@chenfengyuan/vue-barcode/-/vue-barcode-2.0.2.tgz#c6a1549af71f553763a97d56ec75e19cdd921a65"
+  integrity sha512-lHQhYfcqWeeA/UYoe4O+O6c8WD+t9WO8SiWohKOVVIiwPhcvC58YxhvlFvJme0/CPL7+Sh1XCpMaC9Mo2Dt5jQ==
+
 "@esbuild/aix-ppc64@0.25.5":
   version "0.25.5"
   resolved "https://registry.yarnpkg.com/@esbuild/aix-ppc64/-/aix-ppc64-0.25.5.tgz#4e0f91776c2b340e75558f60552195f6fad09f18"
@@ -490,7 +495,7 @@ he@^1.2.0:
   resolved "https://registry.yarnpkg.com/he/-/he-1.2.0.tgz#84ae65fa7eafb165fddb61566ae14baf05664f0f"
   integrity sha512-F/1DnUGPopORZi0ni+CvrCgHQ5FyEAHRLSApuYWMmrbSwoN2Mn/7k+Gl38gJnR7yyDZk6WLXwiGod1JOWNDKGw==
 
-jsbarcode@^3.5.8:
+jsbarcode@3, jsbarcode@^3.5.8:
   version "3.12.1"
   resolved "https://registry.yarnpkg.com/jsbarcode/-/jsbarcode-3.12.1.tgz#9ee84826efd8112e017aaf00f72217eae81823b9"
   integrity sha512-QZQSqIknC2Rr/YOUyOkCBqsoiBAOTYK+7yNN3JsqfoUtJtkazxNw1dmPpxuv7VVvqW13kA3/mKiLq+s/e3o9hQ==
