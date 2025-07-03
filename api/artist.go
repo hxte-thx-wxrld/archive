@@ -8,6 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type Artist struct {
@@ -16,11 +17,13 @@ type Artist struct {
 	ArtistPicture string
 }
 
-func GetAllArtists(db *pgx.Conn) ([]Artist, error) {
+func GetAllArtists(db *pgxpool.Pool) ([]Artist, error) {
 	rows, err := db.Query(context.Background(), "select id, name, artist_picture from interpret")
 	if err != nil {
 		return nil, err
 	}
+
+	defer rows.Close()
 
 	var a []Artist
 
@@ -34,7 +37,7 @@ func GetAllArtists(db *pgx.Conn) ([]Artist, error) {
 	return a, nil
 }
 
-func GetSingleArtist(db *pgx.Conn, artistId string) (*Artist, error) {
+func GetSingleArtist(db *pgxpool.Pool, artistId string) (*Artist, error) {
 	row := db.QueryRow(context.Background(), "select id, name, artist_picture from interpret where id = @artistId", pgx.NamedArgs{
 		"artistId": artistId,
 	})
@@ -49,7 +52,7 @@ func GetSingleArtist(db *pgx.Conn, artistId string) (*Artist, error) {
 	return &artist, nil
 }
 
-func ArtistApi(rg *gin.RouterGroup, db *pgx.Conn) {
+func ArtistApi(rg *gin.RouterGroup, db *pgxpool.Pool) {
 	ag := rg.Group("/artist")
 
 	ag.GET("/", func(ctx *gin.Context) {

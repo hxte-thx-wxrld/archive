@@ -22,23 +22,24 @@ export default {
             <img :src="'http://s3.rillo.internal:8333' + data.CoverUrl">
         </div>
         <div class="meta">
-            
-            <h1>{{ data.Tracktitle }}</h1>
-            <div></div>
+
+            <h1 class="title">{{ data.Tracktitle }}</h1>
             <strong>Artist:</strong>
             <RouterLink :to="'/artist/' + data.ArtistId">{{ data.Artist }}</RouterLink>
             <strong>Release-Code: </strong>
-            <a v-if="data.ReleaseId != null" class="release-code" :href="'/release/' + data.ReleaseId">{{ data.CatalogNo }}</a>
+            <a v-if="data.ReleaseId != null" class="release-code" :href="'/release/' + data.ReleaseId">{{ data.CatalogNo
+                }}</a>
             <small v-else>no catalog release</small>
             <p>Play: </p>
-            <audio v-if="data.PublicUrl != null" controls :src="'http://10.0.0.4:8333' + data.PublicUrl"></audio>
-            <small v-else>stream not available</small>
+            <p>
+
+                <audio v-if="data.PublicUrl != null" controls :src="'http://10.0.0.4:8333' + data.PublicUrl"></audio>
+                <small v-else>stream not available</small>
+            </p>
 
         </div>
 
     </div>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

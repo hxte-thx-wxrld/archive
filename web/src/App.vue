@@ -4,7 +4,11 @@ import HelloWorld from './components/HelloWorld.vue'
 </script>
 <script lang="ts">
 export default {
-
+  methods: {
+    showLoginModal(event) {
+      (this.$refs.loginDialog as HTMLDialogElement).showModal();
+    }
+  }
 }
 </script>
 
@@ -24,9 +28,9 @@ export default {
       </div>
       <div class="sub">
         <nav>
-          <RouterLink to="/track">Tracks</RouterLink>
-          <RouterLink to="/release">Releases</RouterLink>
-          <RouterLink to="/artist">Artists</RouterLink>
+          <RouterLink :class="$route.name == 'tracks'" to="/catalog">Catalog</RouterLink>
+          <!-- <RouterLink :class="$route.name == 'artists'" to="/artist">Art Gallery</RouterLink> -->
+          <RouterLink :class="$route.name == 'releases'" to="/about">About</RouterLink>
         </nav>
       </div>
     </header>
@@ -34,8 +38,12 @@ export default {
       <RouterView />
     </main>
     <footer>
-      TESTING
+      <a href="#" @click.prevent="showLoginModal">Login</a>
     </footer>
+
+    <dialog ref="loginDialog">
+      Hello World :3
+    </dialog>
   </div>
 </template>
 
@@ -44,8 +52,15 @@ header {
     padding: 1em 0;
 }
 
-.top .logo {
-  width: 50%;
+.sub nav * {
+  background-color: white;
+  color: black;
+  padding: .5em;
+  font-family: "Apricot200L";
+}
+
+.selected {
+  background-color: grey;
 }
 
 .sub nav {
@@ -60,7 +75,7 @@ header {
 
 header .top {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
 }
 header .top .action {
   align-self:center;

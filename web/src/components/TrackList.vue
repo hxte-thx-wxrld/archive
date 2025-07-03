@@ -27,7 +27,7 @@ export default {
             </div>
             
             <div class="name-area">
-                    <RouterLink class="open-track" :to="'/track/' + item.TrackId">
+                    <RouterLink class="open-track" :to="'/catalog/tracks/' + item.TrackId">
                     <div class="tracktitle">
                         <strong>
                             {{ item.Tracktitle }}

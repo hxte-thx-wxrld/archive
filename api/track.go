@@ -8,6 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type MusicRow struct {
@@ -22,10 +23,10 @@ type MusicRow struct {
 	CoverUrl    *string
 }
 
-func GetMusic(db *pgx.Conn) ([]MusicRow, error) {
+func GetTracks(db *pgxpool.Pool) ([]MusicRow, error) {
 	args := pgx.NamedArgs{}
 
-	sql := "select track_id, tracktitle, artist, catalog_no, release_date::text, url, cover_url from all_tracks ORDER by release_date ASC"
+	sql := "select track_id, tracktitle, artist, catalog_no, release_date::text, url, cover_url from all_tracks order by release_date is null, random() > 0.5, release_date DESC"
 
 	rows, err := db.Query(context.Background(), sql, args)
 
@@ -49,7 +50,7 @@ func GetMusic(db *pgx.Conn) ([]MusicRow, error) {
 	return music, nil
 }
 
-func GetSingleTrack(db *pgx.Conn, id string) (*MusicRow, error) {
+func GetSingleTrack(db *pgxpool.Pool, id string) (*MusicRow, error) {
 	row := db.QueryRow(context.Background(), "select tracktitle, artist_id, artist, catalog_no, release_date::text, url, release_id, cover_url from all_tracks where track_id = @id", pgx.NamedArgs{
 		"id": id,
 	})
@@ -66,13 +67,13 @@ func GetSingleTrack(db *pgx.Conn, id string) (*MusicRow, error) {
 	return &track, nil
 }
 
-func TrackApi(rg *gin.RouterGroup, db *pgx.Conn) {
+func TrackApi(rg *gin.RouterGroup, db *pgxpool.Pool) {
 	ag := rg.Group("/track")
 	//ag.Use(cors.Default())
 
 	ag.GET("/", func(ctx *gin.Context) {
-		music, err := GetMusic(db)
-		log.Println(music)
+		music, err := GetTracks(db)
+
 		if err != nil {
 			log.Println(err)
 			ctx.JSON(http.StatusInternalServerError, err)

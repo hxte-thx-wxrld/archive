@@ -8,6 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type Release struct {
@@ -27,10 +28,16 @@ type MusicInRelease struct {
 	ArtistName string
 }
 
-func GetMusicInReleases(db *pgx.Conn, releaseId string) ([]MusicInRelease, error) {
+func GetMusicInReleases(db *pgxpool.Pool, releaseId string) ([]MusicInRelease, error) {
 	rows, err := db.Query(context.Background(), "select m.id, m.title, mr.order, i.name from music_in_releases mr join music m on m.id = mr.music_id join interpret i on m.artist_id = i.id where release_id = @releaseId order by mr.order", pgx.NamedArgs{
 		"releaseId": releaseId,
 	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
 
 	var r []MusicInRelease
 	for rows.Next() {
@@ -43,12 +50,14 @@ func GetMusicInReleases(db *pgx.Conn, releaseId string) ([]MusicInRelease, error
 	return r, err
 }
 
-func GetAllReleases(db *pgx.Conn) ([]Release, error) {
+func GetAllReleases(db *pgxpool.Pool) ([]Release, error) {
 	sql := "select name, release_date::text, isrc, public_cover_url, id, catalog_id from releases order by release_date desc"
 	rows, err := db.Query(context.Background(), sql)
 	if err != nil {
 		return nil, err
 	}
+
+	defer rows.Close()
 
 	var r []Release
 	for rows.Next() {
@@ -61,7 +70,7 @@ func GetAllReleases(db *pgx.Conn) ([]Release, error) {
 	return r, nil
 }
 
-func GetSingleRelease(db *pgx.Conn, releaseId string) (*Release, error) {
+func GetSingleRelease(db *pgxpool.Pool, releaseId string) (*Release, error) {
 	row := db.QueryRow(context.Background(), "select name, release_date::text, isrc, public_cover_url, id, catalog_id from releases where id = @releaseId", pgx.NamedArgs{
 		"releaseId": releaseId,
 	})
@@ -82,7 +91,7 @@ func GetSingleRelease(db *pgx.Conn, releaseId string) (*Release, error) {
 	return &release, nil
 }
 
-func ReleaseApi(rg *gin.RouterGroup, db *pgx.Conn) {
+func ReleaseApi(rg *gin.RouterGroup, db *pgxpool.Pool) {
 	ag := rg.Group("/release")
 	ag.GET("/", func(ctx *gin.Context) {
 		r, err := GetAllReleases(db)

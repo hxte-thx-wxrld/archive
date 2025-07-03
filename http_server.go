@@ -1,7 +1,6 @@
 package htwarchive
 
 import (
-	"context"
 	"embed"
 	"io/fs"
 	"log"
@@ -10,7 +9,7 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/htw-archive/api"
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 var r = gin.Default()
@@ -21,9 +20,13 @@ var f embed.FS
 //go:embed web/dist/index.html
 var index_html []byte
 
-func Serve(conn *pgx.Conn) {
+func sendWebClient(ctx *gin.Context) {
+	ctx.Data(http.StatusOK, "text/html", index_html)
+}
 
-	defer conn.Close(context.Background())
+func Serve(conn *pgxpool.Pool) {
+
+	defer conn.Close()
 
 	r.Use(cors.Default())
 	dist, err := fs.Sub(f, "web/dist/assets")
@@ -33,9 +36,8 @@ func Serve(conn *pgx.Conn) {
 
 	r.StaticFS("/assets", http.FS(dist))
 
-	r.GET("/", func(ctx *gin.Context) {
-		ctx.Data(http.StatusOK, "text/html", index_html)
-	})
+	r.GET("/:page", sendWebClient)
+	r.GET("/", sendWebClient)
 
 	ag := r.Group("/api")
 

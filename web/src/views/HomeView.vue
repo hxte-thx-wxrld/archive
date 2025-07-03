@@ -1,7 +1,6 @@
 <script setup lang="ts">
 //import UploadComp from './components/UploadComp.vue'
-import ArtistList from './components/ArtistList.vue';
-import BrowseList from './components/TrackList.vue'
+import TrackList from '../components/TrackList.vue';
 </script>
 
 <script lang="ts">
@@ -11,9 +10,9 @@ export default {
 </script>
 
 <template>
-    <h1>Artists</h1>
+    <h1>Home</h1>
     <Suspense>
-        <ArtistList />
+        <TrackList />
         <template #fallback>
             Loading...
         </template>
@@ -21,7 +20,7 @@ export default {
     <!-- <UploadComp /> -->
 </template>
 
-<style>
+<style scoped>
 h1 {
     padding: 1em 0;
 }

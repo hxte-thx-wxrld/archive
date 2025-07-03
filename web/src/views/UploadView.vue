@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import UploadComp from './components/UploadComp.vue'
-import BrowseList from './components/TrackList.vue'
+import UploadComp from '../components/UploadComp.vue'
+import BrowseList from '../components/TrackList.vue'
 </script>
 
 <script lang="ts">

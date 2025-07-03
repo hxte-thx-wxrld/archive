@@ -1,25 +1,17 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-import HomeView from './HomeView.vue'
-import AboutView from './AboutView.vue'
-import SingleTrackView from './SingleTrackView.vue'
-import SingleReleasesView from './SingleReleasesView.vue'
-import SingleArtistView from './SingleArtistView.vue'
-import TrackView from './TrackView.vue'
-import ReleasesView from './ReleasesView.vue'
-import ArtistView from './ArtistView.vue'
-import UploadView from './UploadView.vue'
+import HomeView from './views/HomeView.vue'
+import AboutView from './views/AboutView.vue'
+import UploadView from './views/UploadView.vue'
+import CatalogView from './views/CatalogView.vue'
+import SingleView from './views/SingleView.vue'
 
 const routes = [
   { path: '/', component: HomeView },
   { path: '/about', component: AboutView },
-  { path: '/track/:id', component: SingleTrackView },
-  { path: '/track', component: TrackView },
-  { path: '/release', component: ReleasesView },
-  { path: '/release/:id', component: SingleReleasesView },
-  { path: '/artist', component: ArtistView },
-  { path: '/artist/:id', component: SingleArtistView },
   { path: '/upload', component: UploadView },
+  { path: '/catalog/:mode', component: CatalogView, alias: ["/catalog"] },
+  { path: '/catalog/:mode/:id', component: SingleView },
 ]
 
 export const router = createRouter({
