@@ -13,4 +13,5 @@ export function getDevPrefix() {
 createApp(App)
     .use(router)
     .component(VueBarcode.name, VueBarcode)
+    //.component("VPaginator", VuePaginator)
     .mount('#app')

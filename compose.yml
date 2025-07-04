@@ -28,9 +28,10 @@ services:
     #  - 8080:8080
     environment:
       PG_URL: postgres://pguser:pgpassword@db:5432/pguser?search_path=public
-      GIN_MODE: release
+      #GIN_MODE: release
     volumes:
       - "./.env:/.env"
+      - ".:/app"
   weed:
     image: chrislusf/seaweedfs # use a remote image
     restart: always

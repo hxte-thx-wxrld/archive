@@ -21,12 +21,44 @@ type MusicRow struct {
 	PublicUrl   *string
 	ReleaseId   *string
 	CoverUrl    *string
+	Length      string
 }
 
-func GetTracks(db *pgxpool.Pool) ([]MusicRow, error) {
-	args := pgx.NamedArgs{}
+type MusicLookup struct {
+	Rows       []MusicRow
+	FullLength int
+}
 
-	sql := "select track_id, tracktitle, artist, catalog_no, release_date::text, url, cover_url from all_tracks order by release_date is null, random() > 0.5, release_date DESC"
+func GetTracksTotalCount(db *pgxpool.Pool) (*int, error) {
+	sql := "select count(*)/15 from all_tracks"
+
+	row := db.QueryRow(context.Background(), sql)
+
+	var count int
+	err := row.Scan(&count)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &count, nil
+}
+
+func GetTracks(db *pgxpool.Pool, limit int, offset int) ([]MusicRow, error) {
+	args := pgx.NamedArgs{
+		"limit":  "ALL",
+		"offset": 0,
+	}
+
+	if limit != 0 {
+		args["limit"] = limit
+	}
+
+	if offset != 0 {
+		args["offset"] = offset
+	}
+
+	sql := "select track_id, tracktitle, artist, artist_id, catalog_no, release_date::text, url, cover_url, length::text from all_tracks order by release_date is null, release_date DESC "
 
 	rows, err := db.Query(context.Background(), sql, args)
 
@@ -40,7 +72,7 @@ func GetTracks(db *pgxpool.Pool) ([]MusicRow, error) {
 
 	for rows.Next() {
 		entry := MusicRow{}
-		if err := rows.Scan(&entry.TrackId, &entry.Tracktitle, &entry.Artist, &entry.CatalogNo, &entry.ReleaseDate, &entry.PublicUrl, &entry.CoverUrl); err != nil {
+		if err := rows.Scan(&entry.TrackId, &entry.Tracktitle, &entry.Artist, &entry.ArtistId, &entry.CatalogNo, &entry.ReleaseDate, &entry.PublicUrl, &entry.CoverUrl, &entry.Length); err != nil {
 			return nil, err
 		}
 
@@ -51,13 +83,13 @@ func GetTracks(db *pgxpool.Pool) ([]MusicRow, error) {
 }
 
 func GetSingleTrack(db *pgxpool.Pool, id string) (*MusicRow, error) {
-	row := db.QueryRow(context.Background(), "select tracktitle, artist_id, artist, catalog_no, release_date::text, url, release_id, cover_url from all_tracks where track_id = @id", pgx.NamedArgs{
+	row := db.QueryRow(context.Background(), "select tracktitle, artist_id, artist, catalog_no, release_date::text, url, release_id, cover_url, length::text from all_tracks where track_id = @id", pgx.NamedArgs{
 		"id": id,
 	})
 
 	var track MusicRow
 
-	err := row.Scan(&track.Tracktitle, &track.ArtistId, &track.Artist, &track.CatalogNo, &track.ReleaseDate, &track.PublicUrl, &track.ReleaseId, &track.CoverUrl)
+	err := row.Scan(&track.Tracktitle, &track.ArtistId, &track.Artist, &track.CatalogNo, &track.ReleaseDate, &track.PublicUrl, &track.ReleaseId, &track.CoverUrl, &track.Length)
 	track.TrackId = id
 
 	if err != nil {
@@ -69,16 +101,31 @@ func GetSingleTrack(db *pgxpool.Pool, id string) (*MusicRow, error) {
 
 func TrackApi(rg *gin.RouterGroup, db *pgxpool.Pool) {
 	ag := rg.Group("/track")
-	//ag.Use(cors.Default())
 
 	ag.GET("/", func(ctx *gin.Context) {
-		music, err := GetTracks(db)
+		//p := ctx.Request.URL.Query().Get("p")
+		/*i, err := strconv.Atoi(p)
 
+		if err != nil {
+			i = 0
+		}*/
+
+		fullLength, err := GetTracksTotalCount(db)
+		if err != nil {
+			log.Println(err)
+			ctx.JSON(http.StatusInternalServerError, err)
+			return
+		}
+
+		music, err := GetTracks(db, 0, 0)
 		if err != nil {
 			log.Println(err)
 			ctx.JSON(http.StatusInternalServerError, err)
 		} else {
-			ctx.JSON(http.StatusOK, music)
+			ctx.JSON(http.StatusOK, MusicLookup{
+				Rows:       music,
+				FullLength: *fullLength,
+			})
 		}
 	})
 

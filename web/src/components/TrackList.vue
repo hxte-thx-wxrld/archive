@@ -1,17 +1,22 @@
 <script lang="ts">
 import { getDevPrefix } from '../main'
 import MockTracks from '../mock/all_tracks.json'
+async function reloadList(page) {
+    const req = await fetch(getDevPrefix() + "/api/track/?=" + page)
+    return await req.json()
+}
 
 export default {
-    async setup() {
-        const req = await fetch(getDevPrefix() + "/api/track/")
-        const data = await req.json()
-
+    props: ["page"],
+    async setup(props) {        
+        const data = await reloadList(props.page)
         console.log(data)
-
+        
         return {
             data
         }
+    },
+    methods: {
     },
     data() {
         return {}
@@ -21,7 +26,7 @@ export default {
 
 <template>
     <div class="browse-list">
-        <div class="row" v-for="(item, index) in data">
+        <div class="row" v-for="(item, index) in data.Rows">
             <div class="cover-area">
                 <img :src="'http://s3.rillo.internal:8333' + item.CoverUrl">
             </div>

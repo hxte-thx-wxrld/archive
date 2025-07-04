@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import HelloWorld from './components/HelloWorld.vue'
+import LoginDialog from './components/LoginDialog.vue'
 
 </script>
 <script lang="ts">
@@ -42,7 +43,7 @@ export default {
     </footer>
 
     <dialog ref="loginDialog">
-      Hello World :3
+      <LoginDialog />
     </dialog>
   </div>
 </template>

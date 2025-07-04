@@ -7,7 +7,7 @@ export default defineConfig({
   publicDir: false,
   
   server: {
-    allowedHosts: ["frontend"],
+    allowedHosts: ["172.16.0.0/12", "frontend"],
     watch: {
       usePolling: true,
       interval: 100,

@@ -30,8 +30,16 @@ func Serve(conn *pgxpool.Pool) {
 
 	defer conn.Close()
 
+	r.SetTrustedProxies([]string{"172.16.0.0/12"})
+
 	store := cookie.NewStore(([]byte("secret")))
-	r.Use(cors.Default())
+	//r.Use(cors.Default())
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:5173", "http://localhost:8080"},
+		AllowMethods:     []string{"GET", "POST", "PUT"},
+		AllowHeaders:     []string{"Origin"},
+		AllowCredentials: true,
+	}))
 	r.Use(sessions.Sessions("ui_session", store))
 
 	dist, err := fs.Sub(f, "web/dist/assets")

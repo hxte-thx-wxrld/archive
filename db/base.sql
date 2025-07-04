@@ -22,6 +22,9 @@ ALTER TABLE IF EXISTS ONLY public.music_in_releases DROP CONSTRAINT IF EXISTS mu
 ALTER TABLE IF EXISTS ONLY public.music DROP CONSTRAINT IF EXISTS music_artists_fk;
 DROP TRIGGER IF EXISTS trigger_set_catalog_id ON public.releases;
 DROP INDEX IF EXISTS public.music_filepath_idx;
+ALTER TABLE IF EXISTS ONLY public.users DROP CONSTRAINT IF EXISTS users_pk;
+ALTER TABLE IF EXISTS ONLY public.tags DROP CONSTRAINT IF EXISTS tags_unique_1;
+ALTER TABLE IF EXISTS ONLY public.tags DROP CONSTRAINT IF EXISTS tags_unique;
 ALTER TABLE IF EXISTS ONLY public.releases DROP CONSTRAINT IF EXISTS releases_unique;
 ALTER TABLE IF EXISTS ONLY public.releases DROP CONSTRAINT IF EXISTS releases_pk;
 ALTER TABLE IF EXISTS ONLY public.music DROP CONSTRAINT IF EXISTS music_pk;
@@ -30,6 +33,8 @@ ALTER TABLE IF EXISTS ONLY public.music_in_releases DROP CONSTRAINT IF EXISTS mu
 ALTER TABLE IF EXISTS ONLY public.interpret DROP CONSTRAINT IF EXISTS artists_unique;
 ALTER TABLE IF EXISTS ONLY public.interpret DROP CONSTRAINT IF EXISTS artists_pk;
 ALTER TABLE IF EXISTS public.music_in_releases ALTER COLUMN id DROP DEFAULT;
+DROP TABLE IF EXISTS public.users;
+DROP TABLE IF EXISTS public.tags;
 DROP SEQUENCE IF EXISTS public.music_in_releases_id_seq;
 DROP VIEW IF EXISTS public.all_tracks;
 DROP VIEW IF EXISTS public.published;
@@ -135,7 +140,9 @@ CREATE TABLE public.music (
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
     filepath text,
     public_url text,
-    cover_url text DEFAULT '/covers/default.png'::text
+    cover_url text DEFAULT '/covers/default.png'::text,
+    length integer DEFAULT 0 NOT NULL,
+    bpm real DEFAULT 0.0 NOT NULL
 );
 
 
@@ -206,7 +213,8 @@ CREATE VIEW public.all_tracks AS
         CASE
             WHEN (p.release_id IS NULL) THEN m.cover_url
             ELSE p.cover_url
-        END AS cover_url
+        END AS cover_url,
+    ((m.length)::double precision * '00:00:01'::interval) AS length
    FROM ((public.music m
      JOIN public.interpret i ON ((i.id = m.artist_id)))
      LEFT JOIN public.published p ON ((p.track_id = m.id)));
@@ -230,6 +238,27 @@ CREATE SEQUENCE public.music_in_releases_id_seq
 --
 
 ALTER SEQUENCE public.music_in_releases_id_seq OWNED BY public.music_in_releases.id;
+
+
+--
+-- Name: tags; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.tags (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    label text NOT NULL
+);
+
+
+--
+-- Name: users; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.users (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    username text NOT NULL,
+    password_hash bytea NOT NULL
+);
 
 
 --
@@ -293,6 +322,30 @@ ALTER TABLE ONLY public.releases
 
 ALTER TABLE ONLY public.releases
     ADD CONSTRAINT releases_unique UNIQUE (id);
+
+
+--
+-- Name: tags tags_unique; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.tags
+    ADD CONSTRAINT tags_unique UNIQUE (id);
+
+
+--
+-- Name: tags tags_unique_1; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.tags
+    ADD CONSTRAINT tags_unique_1 UNIQUE (label);
+
+
+--
+-- Name: users users_pk; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_pk PRIMARY KEY (username);
 
 
 --

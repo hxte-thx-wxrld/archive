@@ -42,7 +42,7 @@ export default {
 
     <div v-if="getSubmode() == 'tracks'">
         <Suspense>
-            <TrackList />
+            <TrackList :page="$route.query.p" />
             <template #fallback>
                 Loading...
             </template>
