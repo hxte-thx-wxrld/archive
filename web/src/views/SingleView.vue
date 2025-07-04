@@ -69,9 +69,12 @@ export default {
 }
 
 .mode-title-container {
+    position: sticky;
+    top: 0;
     padding-bottom: 2em;
     margin-bottom: 2em;
     border-bottom: 2px dashed white;
+    background-color: black;
 }
 
 .back-icon {

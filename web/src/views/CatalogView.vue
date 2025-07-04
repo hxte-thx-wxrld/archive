@@ -134,6 +134,11 @@ nav.mode a {
 
 nav.mode a.active {
     background-color: grey;
+    color: white;
+}
+
+nav.mode a.active::before {
+    filter: invert(1)
 }
 
 nav.mode>* {

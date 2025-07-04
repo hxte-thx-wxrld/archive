@@ -61,6 +61,9 @@ export default {
 </template>
 
 <style scoped>
+.barcode {
+    z-index: -1;
+}
 .barcode svg {
     width: 100%;
 }
