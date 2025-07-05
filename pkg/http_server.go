@@ -10,34 +10,33 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
-	"github.com/htw-archive/api"
+	"github.com/htw-archive/pkg/api"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 var r = gin.Default()
 
-//go:embed web/dist
-var f embed.FS
+func Serve(conn *pgxpool.Pool, index_html []byte, f embed.FS) {
 
-//go:embed web/dist/index.html
-var index_html []byte
-
-func sendWebClient(ctx *gin.Context) {
-	ctx.Data(http.StatusOK, "text/html", index_html)
-}
-
-func Serve(conn *pgxpool.Pool) {
+	sendWebClient := func(ctx *gin.Context) {
+		ctx.Data(http.StatusOK, "text/html", index_html)
+	}
 
 	defer conn.Close()
 
 	r.SetTrustedProxies([]string{"172.16.0.0/12"})
 
 	store := cookie.NewStore(([]byte("secret")))
+	store.Options(sessions.Options{
+		HttpOnly: true,
+		Secure:   false,
+	})
 	//r.Use(cors.Default())
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:5173", "http://localhost:8080"},
-		AllowMethods:     []string{"GET", "POST", "PUT"},
-		AllowHeaders:     []string{"Origin"},
+		AllowOrigins: []string{"http://localhost:5173", "http://localhost:8080"},
+		AllowMethods: []string{"GET", "POST", "PUT", "OPTIONS"},
+		AllowHeaders: []string{"Origin", "Cookies"},
+
 		AllowCredentials: true,
 	}))
 	r.Use(sessions.Sessions("ui_session", store))

@@ -15,7 +15,7 @@ type UserLookupResult struct {
 }
 
 func LookupUser(db *pgxpool.Pool, userid string) (*UserLookupResult, error) {
-	row := db.QueryRow(context.Background(), "select name from users where id = @userid", pgx.NamedArgs{
+	row := db.QueryRow(context.Background(), "select username from users where id = @userid", pgx.NamedArgs{
 		"userid": userid,
 	})
 

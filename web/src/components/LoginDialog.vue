@@ -21,7 +21,7 @@ export default {
 
                 const whoami = await fetch(getDevPrefix() + "/api/me", {
                     method: "GET",
-                    credentials: 'include'
+                    credentials: 'same-origin'
                 })
 
                 console.log(await whoami.json());

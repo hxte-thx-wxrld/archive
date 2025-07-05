@@ -24,19 +24,21 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: gow run /app/cmd/main.go
+    command: gow run /app/main.go
+    volumes:
+      - "./pkg:/app/pkg"
     #ports:
     #  - 8080:8080
     environment:
       PG_URL: postgres://pguser:pgpassword@db:5432/pguser?search_path=public
-    volumes:
-      - "./.env:/.env"
+    env_file: .env
+
   weed:
     image: chrislusf/seaweedfs # use a remote image
     restart: always
     ports:
       - 8333:8333
-    command: "server -dir=/data -s3 -idleTimeout=30"
+    command: "server -dir=/data -s3 -idleTimeout=0"
 
     volumes:
       #- "/mnt/hdd/seaweed:/data"

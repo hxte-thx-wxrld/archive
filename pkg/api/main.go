@@ -23,15 +23,22 @@ func InitApi(rg *gin.RouterGroup, db *pgxpool.Pool) {
 
 	rg.GET("/me", func(ctx *gin.Context) {
 		session := sessions.Default(ctx)
-		id := session.Get("userid").(string)
+		id := session.Get("userid")
+		if id == nil {
+			ctx.Status(http.StatusUnauthorized)
+		} else {
+			fmt.Println(id)
 
-		user, err := LookupUser(db, id)
-		if err != nil {
-			fmt.Println(err)
-			ctx.JSON(http.StatusInternalServerError, err)
+			id = id.(string)
+
+			user, err := LookupUser(db, id.(string))
+			if err != nil {
+				fmt.Println(err)
+				ctx.JSON(http.StatusInternalServerError, err)
+			}
+			ctx.JSON(http.StatusOK, user)
 		}
 
-		ctx.JSON(http.StatusOK, user)
 	})
 
 	rg.POST("/signup", func(ctx *gin.Context) {
@@ -54,6 +61,12 @@ func InitApi(rg *gin.RouterGroup, db *pgxpool.Pool) {
 		ctx.Status(http.StatusOK)
 	})
 
+	rg.POST("/logout", func(ctx *gin.Context) {
+		session := sessions.Default(ctx)
+		session.Delete("userid")
+		session.Save()
+	})
+
 	rg.POST("/login", func(ctx *gin.Context) {
 		var req LoginRequest
 
@@ -72,12 +85,12 @@ func InitApi(rg *gin.RouterGroup, db *pgxpool.Pool) {
 
 		if err != nil {
 			fmt.Println(err)
-			ctx.JSON(http.StatusForbidden, errors.New("wrong username or password"))
+			ctx.JSON(http.StatusUnauthorized, errors.New("wrong username or password"))
 			return
 		}
 
 		fmt.Println("Userid:", *id)
-		session.Set("userid", *id)
+		session.Set("userid", string(*id))
 		err = session.Save()
 		if err != nil {
 			log.Println(err)

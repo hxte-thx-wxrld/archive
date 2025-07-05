@@ -15,7 +15,6 @@ export default {
 
 <template>
   <div class="root">
-
     <header>
       <div class="top">
         <RouterLink to="/">
