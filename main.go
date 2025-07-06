@@ -20,6 +20,8 @@ func main() {
 	if err != nil {
 		log.Println("Error loading .env file", err)
 	}
+
+	//config := htwarchive.DefaultServerConfig()
 	conn := htwarchive.InitDb()
 	htwarchive.Serve(conn, index_html, f)
 }

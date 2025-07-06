@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { mapGetters } from 'vuex'
 import { getDevPrefix } from '../main'
-import CreateArtistDialog from './CreateArtistDialog.vue'
+import CreateArtistDialog from './dialogs/ArtistCreateDialog.vue'
 import { ref } from 'vue';
 import type { Artist } from '../types'
 
@@ -17,9 +17,7 @@ export default {
         CreateArtistDialog: CreateArtistDialog
     },
     methods: {
-        openNew() {
-            (this.$refs.new_artist as HTMLDialogElement).showModal()
-        }
+
     },
     computed: {
         ...mapGetters(["isLoggedIn"])
@@ -31,7 +29,7 @@ export default {
 </script>
 
 <template>
-    <a href="#" @click.prevent="openNew" v-if="isLoggedIn">Add New</a>
+
     <div class="browse-list">
         <div class="row" v-for="(item, index) in data">
             <div class="cover-area">
@@ -39,19 +37,20 @@ export default {
             </div>
 
             <div class="name-area">
-                <RouterLink class="open-track" :to="'/catalog/artists/' + item.ArtistId">
-                    <div class="tracktitle">
-                        <strong>
-                            {{ item.Name }}
-                        </strong>
-                    </div>
-                </RouterLink>
+
+                    <a class="open-track" href="#" @click="$emit('artistSelect', item)">
+
+                        <div class="tracktitle">
+                            <strong>
+                                {{ item.Name }}
+                            </strong>
+                        </div>
+                    </a>
+
             </div>
         </div>
     </div>
-    <dialog v-if="isLoggedIn" ref="new_artist">
-        <CreateArtistDialog />
-    </dialog>
+
 </template>
 
 <style lang="css" scoped>

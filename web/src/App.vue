@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { mapGetters } from 'vuex';
 import HelloWorld from './components/HelloWorld.vue'
-import LoginDialog from './components/LoginDialog.vue'
+import LoginDialog from './components/dialogs/LoginDialog.vue'
 
 </script>
 <script lang="ts">
@@ -217,6 +217,20 @@ body {
   filter: invert(1)
 }
 
+button, input[type=submit] {
+  -webkit-appearance: none;
+  background-color: white;
+  border: 0;
+  font: inherit;
+  color: black;
+  padding: .5em;
+  cursor: pointer;
+}
+
+button:active {
+  background-color: grey;
+}
+
 /* iphone */
 @media only screen and (max-width: 600px) {
   .showcase {
@@ -280,6 +294,10 @@ body {
 
   .top .logo {
     width: 50%;
+  }
+  
+  header .top a {
+    text-align: center;
   }
 }
 </style>

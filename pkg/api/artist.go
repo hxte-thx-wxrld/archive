@@ -20,7 +20,7 @@ type Artist struct {
 }
 
 func AssignArtistToUser(db *pgxpool.Pool, userid string, artistid string) error {
-	_, err := db.Query(context.Background(), "insert into artist_of_user (user_id, artist_id) values (@userid, @artistid)", pgx.NamedArgs{
+	_, err := db.Query(context.Background(), "insert into artists_of_user (user_id, artist_id) values (@userid, @artistid)", pgx.NamedArgs{
 		"userid":   userid,
 		"artistid": artistid,
 	})

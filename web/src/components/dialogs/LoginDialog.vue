@@ -1,5 +1,5 @@
 <script lang="ts">
-import { getDevPrefix } from '../main';
+import { getDevPrefix } from '../../main';
 
 export default {
     data() {

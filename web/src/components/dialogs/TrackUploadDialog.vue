@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import AssignedArtistsPicker from './AssignedArtistsPicker.vue';
-import UploadComp from './UploadComp.vue';
+import AssignedArtistsPicker from '../AssignedArtistsPicker.vue';
+import UploadComp from '../UploadComp.vue';
 </script>
 
 <script lang="ts">
@@ -37,10 +37,13 @@ export default {
 <template>
     <form @submit.prevent="uploadTrack">
 
-        <p class="full-width">Create new Track</p>
+        <h2 class="full-width">Create new Track</h2>
 
         <label for="TrackTitle">Trackname:</label>
         <input type="text" name="TrackTitle">
+
+        <label for="ReleaseDate">Release Date:</label>
+        <input type="date" name="ReleaseDate" :value="new Date()">
 
         <label for="ArtistId">Artist:</label>
         <AssignedArtistsPicker />

@@ -19,7 +19,7 @@ export const store = createStore<State>({
     },
     mutations: {
         setUserdata(state, data) {
-            console.log(data)
+            console.table(data)
             state.UserId = data.UserId
             state.Username = data.Username
             state.AssignedArtists = data.AssignedArtists

@@ -23,6 +23,7 @@ func AuthenticatedMiddleware(ctx *gin.Context) {
 	session := sessions.Default(ctx)
 
 	id := session.Get("userid")
+	fmt.Println("Middleware", id)
 	if id == nil {
 		ctx.Status(http.StatusUnauthorized)
 	} else {

@@ -2,6 +2,9 @@
 import TrackShowcase from "../components/TrackShowcase.vue";
 import ReleaseShowcase from "../components/ReleaseShowcase.vue";
 import ArtistShowcase from "../components/ArtistShowcase.vue";
+import { ref } from "vue";
+
+const editmode = ref(false);
 </script>
 <script lang="ts">
 
@@ -13,10 +16,7 @@ export default {
             } else return this.$route.params.mode;
         },
         objectId() {
-            return this.$route.params.id
-        },
-        createMode() {
-            return this.objectId == "create"
+            return this.$route.params.id as string
         }
     },
 }
@@ -31,7 +31,7 @@ export default {
             <RouterLink to="/catalog/tracks">Back to Catalog</RouterLink>
         </div>
         <Suspense>
-            <TrackShowcase :editmode="createMode" :track-id="objectId" />
+            <TrackShowcase :edit="editmode" :track-id="objectId" />
             <template #loading>
                 Loading...
             </template>

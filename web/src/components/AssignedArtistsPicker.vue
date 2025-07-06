@@ -13,3 +13,14 @@
         </option>
     </select>
 </template>
+
+<style scoped>
+    select {
+        border: 0;
+        background-color: inherit;
+        -webkit-appearance: none;
+        color: inherit;
+        font-family: inherit;
+        font-size: inherit;
+    }
+</style>

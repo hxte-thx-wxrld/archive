@@ -21,7 +21,7 @@ type LoginRequest struct {
 	Password string `json:"password"`
 }
 
-func NewPresignUrl(bucket string, key string) (string, error) {
+func NewPresignUrl(bucket string, key string) (*string, error) {
 	sess, err := session.NewSession(&aws.Config{
 		Region:   aws.String("US"),
 		Endpoint: aws.String("http://127.0.0.1:8333"),
@@ -31,7 +31,7 @@ func NewPresignUrl(bucket string, key string) (string, error) {
 		CredentialsChainVerboseErrors: aws.Bool(true),
 	})
 	if err != nil {
-
+		return nil, err
 	}
 	aws.NewConfig()
 	svc := s3.New(sess)
@@ -43,7 +43,7 @@ func NewPresignUrl(bucket string, key string) (string, error) {
 	urlStr, err := req.Presign(15 * time.Minute)
 
 	//return Presigner{PresignClient: presignClient}
-	return urlStr, err
+	return &urlStr, err
 }
 
 func InitApi(rg *gin.RouterGroup, db *pgxpool.Pool) {

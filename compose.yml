@@ -27,11 +27,11 @@ services:
     #ports:
     #  - 8080:8080
     environment:
-      PG_URL: postgres://pguser:pgpassword@db:5432/pguser?search_path=public
+      #PG_URL: postgres://pguser:pgpassword@db:5432/pguser?search_path=public
+      #S3_ENDPOINT: 
       #GIN_MODE: release
     volumes:
       - "./.env:/.env"
-      - ".:/app"
   weed:
     image: chrislusf/seaweedfs # use a remote image
     restart: always

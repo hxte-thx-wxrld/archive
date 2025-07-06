@@ -1,38 +1,52 @@
 <script setup lang="ts">
 import { mapGetters } from 'vuex'
 import { getDevPrefix } from '../main'
-import CreateTrackDialog from './CreateTrackDialog.vue'
+import CreateTrackDialog from './dialogs/TrackUploadDialog.vue'
+import Paginator from './Paginator.vue'
 import type { MusicRow } from '../types'
 import { ref } from 'vue';
 
 const data = ref<
     {
-        Rows: [MusicRow],
-        FullLength: Number
-    }>()
+        Rows: MusicRow[],
+        FullLength: number,
+    }>();
 
-async function reloadList() {
-    const req = await fetch(getDevPrefix() + "/api/track/")
-    return await req.json()
+const page = ref<number>(0);
+
+const props = defineProps<{
+    showCover: boolean,
+    small: boolean,
+}>();
+
+const emit = defineEmits<{
+    'trackSelect': [MusicRow]
+}>()
+
+async function reloadList(page) {
+    const req = await fetch(getDevPrefix() + "/api/track/?offset=" + page)
+    const j = await req.json();
+    console.table(j.Rows);
+    return j;
 }
 
-data.value = await reloadList()
+function switchPage(i: number) {
+    console.log(i)
+    page.value = i
+    reloadList(page.value).then(d => {
+        data.value = d
+    })
+}
+
+data.value = await reloadList(page.value)
 
 </script>
 <script lang="ts">
 
 
 export default {
-    props: ["page"],
-
     methods: {
-        openNew(event) {
-            console.log(event);
-            (this.$refs.new_track as HTMLDialogElement).showModal();
-        },
-        closeNew(event) {
-            (this.$refs.new_track as HTMLDialogElement).close();
-        },
+
     },
     computed: {
         ...mapGetters(["isLoggedIn"])
@@ -44,31 +58,38 @@ export default {
 </script>
 
 <template>
-    <a href="#" @click.prevent="openNew" v-if="isLoggedIn">Add New</a>
-    <div class="browse-list">
+    <div class="browse-list" :class="{ 'small': small }">
         <div class="row" v-for="(item, index) in data.Rows" v-if="data != null">
-            <div class="cover-area">
+            <div class="cover-area" v-if="showCover">
                 <img :src="'http://s3.rillo.internal:8333' + item.CoverUrl">
             </div>
 
             <div class="name-area">
-                <RouterLink class="open-track" :to="'/catalog/tracks/' + item.TrackId">
+
+                <a href="#" class="open-track" @click.prevent="emit('trackSelect', item)" v-if="small">
+                    <strong>{{ item.Tracktitle }}</strong> <span>-</span> <span>
+                        {{ item.Artist }}
+                    </span>
+                </a>
+
+                <a href="#" class="open-track" @click="emit('trackSelect', item)" v-else>
+
                     <div class="tracktitle">
                         <strong>
                             {{ item.Tracktitle }}
                         </strong>
                     </div>
                     <div class="artist">{{ item.Artist }}</div>
-                    <div v-if="item.CatalogNo" class="catalogId">{{ item.CatalogNo }}</div>
-                    <small class="catalogId" v-else>No catalog release</small>
-                </RouterLink>
+                    <div v-if="item.CatalogNo != null" class="catalogId">{{ item.CatalogNo }}</div>
+                    <small class="catalogId" v-else-if="item.CatalogNo == null">No catalog release</small>
+                </a>
+
             </div>
         </div>
         <div v-else>No Data</div>
+        <Paginator :pagecount="data.FullLength" :page="page" @switchPage="switchPage" />
     </div>
-    <dialog v-if="isLoggedIn" ref="new_track">
-        <CreateTrackDialog />
-    </dialog>
+
 </template>
 
 <style lang="css" scoped>
@@ -77,7 +98,11 @@ a:any-link {
     text-decoration-line: unset;
 }
 
-.browse-list {
+a:hover {
+    text-decoration-line: underline;
+}
+
+.browse-list:not(.small) {
     display: grid;
     justify-items: stretch;
     gap: .5em;
@@ -88,7 +113,7 @@ a:any-link {
     height: 64px;
 }
 
-.browse-list .row {
+.browse-list:not(.small) .row {
     border: 1px solid white;
     display: grid;
     grid-template-columns: 64px 1fr;
@@ -104,4 +129,6 @@ a:any-link {
     align-self: center;
     margin: .5em;
 }
+
+.add-action {}
 </style>

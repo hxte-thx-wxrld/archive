@@ -1,21 +1,41 @@
 <script setup lang="ts">
+import { mapGetters } from 'vuex';
 import { getDevPrefix } from '../main'
 import Showcase from './Showcase.vue';
+import EditableText from './EditableText.vue';
+
+import AssignTracksReleaseDialog from './dialogs/AssignTracksReleaseDialog.vue';
+import { ref } from 'vue';
+import type { Release } from '../types';
+
+function addTrackToRelease(event: MouseEvent) {
+    assigndialog.value.showModal()
+}
+
+async function fetchData(releaseId): Promise<Release> {
+    const req = await fetch(getDevPrefix() + "/api/release/" + releaseId)
+    return req.json()
+}
 
 const props = defineProps({
     "releaseId": String
 });
 
-const req = await fetch(getDevPrefix() + "/api/release/" + props.releaseId)
-const data = await req.json()
+const edit = ref(false);
+const assigndialog = ref<HTMLDialogElement>()
+const data = ref<Release>(await fetchData(props.releaseId));
 
-console.log(data)
+console.log(data.value)
 
 </script>
 
 <script lang="ts">
 export default {
-
+    computed: {
+        ...mapGetters(["isLoggedIn"])
+    },
+    methods: {
+    }
 }
 </script>
 
@@ -29,17 +49,17 @@ export default {
         </template>
 
         <template #default>
-            <h1 class="title">{{ data.Name }}</h1>
-            <strong>Release Date:</strong><span>{{ data.ReleaseDate }}</span>
+            <h1 class="title"><EditableText :edit="edit" :value="data.Name" type="text" name="Name"></EditableText></h1>
+            <strong>Release Date:</strong>
+             <EditableText :edit="edit" :value="data.ReleaseDate" type="date" name="ReleaseDate"></EditableText>
             <strong>Release-Code:</strong><span class="release-code">{{ data.CatalogId }}</span>
 
-            <strong>ISRC-Code:</strong><span>{{ data.Isrc ?? "n. A." }}</span>
-            <span>Play: </span><a v-if="data.PublicUrl != null">Play</a><small v-else>stream not available</small>
+            <strong>ISRC-Code:</strong>
+            <EditableText :edit="edit" :value="data.Isrc" type="text" name="Isrc"></EditableText>
 
             <div class="tracklist">
-
                 <h2>Track List</h2>
-                <ol>
+                <ol class="tracklist">
                     <li v-for="(music, index) in data.RelatedMusic">
                         <a :href="'/catalog/tracks/' + music.TrackId">
                             <div>
@@ -56,13 +76,41 @@ export default {
                             </div>
                         </a>
                     </li>
+                    <a href="#" @click.prevent="addTrackToRelease" v-if="isLoggedIn && edit" class="add">
+                        Add Track to Release
+                    </a>
                 </ol>
+            </div>
+
+            <div class="actionbuttons">
+
+                <button type="button" @click.prevent="edit = !edit" v-if="isLoggedIn">{{ edit ? "Cancel" : "Edit"
+                }}</button>
+                <input type="submit" v-if="edit && isLoggedIn">
             </div>
         </template>
     </Showcase>
+    <dialog id="add_tracks_to_release" ref="assigndialog">
+        <AssignTracksReleaseDialog @save="console.log" @close="assigndialog.close()" />
+    </dialog>
 </template>
 
 <style scoped>
+.actionbuttons {
+    display: flex;
+    gap: 1em;
+}
+#add_tracks_to_release {
+    width: 50%;
+}
+
+.tracklist .add {
+    display: block;
+    padding: 1em 0;
+    border-top: 5px dotted white;
+    list-style-type: circle;
+}
+
 .barcode {
     z-index: -1;
 }
@@ -72,9 +120,9 @@ export default {
 }
 
 img.cover {
-  width: 256px;
-  height: 256px;
-  border: 1px solid white;
+    width: 256px;
+    height: 256px;
+    border: 1px solid white;
 }
 
 li {
@@ -82,16 +130,16 @@ li {
 }
 
 .tracklist {
-    padding: 2em 0;
+    padding: 1em 0 0 0;
     grid-column-start: 1;
     grid-column-end: 3;
 }
 
 .tracklist h2 {
-    margin: 1em 0;
+
 }
 
 .tracklist li {
-    margin: .5em;
+
 }
 </style>
