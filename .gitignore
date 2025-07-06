@@ -4,3 +4,4 @@ dump-*.sql
 .env
 appdata/
 daemon/database.ini
+aws

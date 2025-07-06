@@ -1,17 +1,28 @@
-<script lang="ts">
+<script setup lang="ts">
+import { mapGetters } from 'vuex'
 import { getDevPrefix } from '../main'
-import MockTracks from '../mock/all_tracks.json'
+import CreateArtistDialog from './CreateArtistDialog.vue'
+import { ref } from 'vue';
+import type { Artist } from '../types'
 
+const data = ref<[Artist]>(null);
+const req = await fetch(getDevPrefix() + "/api/artist/")
+data.value = await req.json()
+
+console.log(data.value)
+</script>
+<script lang="ts">
 export default {
-    async setup() {
-        const req = await fetch(getDevPrefix() + "/api/artist/")
-        const data = await req.json()
-
-        console.log(data)
-
-        return {
-            data
+    components: {
+        CreateArtistDialog: CreateArtistDialog
+    },
+    methods: {
+        openNew() {
+            (this.$refs.new_artist as HTMLDialogElement).showModal()
         }
+    },
+    computed: {
+        ...mapGetters(["isLoggedIn"])
     },
     data() {
         return {}
@@ -20,24 +31,27 @@ export default {
 </script>
 
 <template>
+    <a href="#" @click.prevent="openNew" v-if="isLoggedIn">Add New</a>
     <div class="browse-list">
         <div class="row" v-for="(item, index) in data">
             <div class="cover-area">
                 <img :src="'http://s3.rillo.internal:8333' + item.ArtistPicture">
             </div>
-            
+
             <div class="name-area">
-                    <RouterLink class="open-track" :to="'/catalog/artists/' + item.ArtistId">
+                <RouterLink class="open-track" :to="'/catalog/artists/' + item.ArtistId">
                     <div class="tracktitle">
                         <strong>
                             {{ item.Name }}
                         </strong>
                     </div>
-                    <div class="artist">{{ item.Artist }}</div>
                 </RouterLink>
             </div>
         </div>
     </div>
+    <dialog v-if="isLoggedIn" ref="new_artist">
+        <CreateArtistDialog />
+    </dialog>
 </template>
 
 <style lang="css" scoped>
@@ -45,6 +59,7 @@ a:any-link {
     color: unset;
     text-decoration-line: unset;
 }
+
 .browse-list {
     display: grid;
     justify-items: stretch;

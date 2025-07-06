@@ -1,5 +1,5 @@
 packages:
-  - path: "."
+  - path: "./pkg"
     output_path: "./web/src/types"
     type_mappings:
       time.Time: "string /* RFC3339 */"

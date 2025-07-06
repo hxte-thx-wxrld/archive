@@ -1,31 +1,34 @@
-<script lang="ts">
+<script setup lang="ts">
 import { getDevPrefix } from '../main'
+import Showcase from './Showcase.vue';
 
+const props = defineProps({
+    "releaseId": String
+});
 
+const req = await fetch(getDevPrefix() + "/api/release/" + props.releaseId)
+const data = await req.json()
+
+console.log(data)
+
+</script>
+
+<script lang="ts">
 export default {
-    props: ['releaseId'],
-    async setup(props) {
-        console.log(props.releaseId)
-        const req = await fetch(getDevPrefix() + "/api/release/" + props.releaseId)
-        const data = await req.json()
 
-        console.log(data)
-        return {
-            data
-        }
-    }
 }
 </script>
 
 <template>
-    <div class="showcase">
-        <div class="cover-area">
-            <img :src="'http://s3.rillo.internal:8333' + data.CoverUrl">
+    <Showcase>
+        <template #left>
+            <img class="cover" :src="'http://s3.rillo.internal:8333' + data.CoverUrl">
             <div class="barcode">
                 <vue-barcode :value="data.CatalogId" :options="{ displayValue: true }" tag="svg"></vue-barcode>
             </div>
-        </div>
-        <div class="meta">
+        </template>
+
+        <template #default>
             <h1 class="title">{{ data.Name }}</h1>
             <strong>Release Date:</strong><span>{{ data.ReleaseDate }}</span>
             <strong>Release-Code:</strong><span class="release-code">{{ data.CatalogId }}</span>
@@ -39,8 +42,8 @@ export default {
                 <ol>
                     <li v-for="(music, index) in data.RelatedMusic">
                         <a :href="'/catalog/tracks/' + music.TrackId">
-                        <div>
-                            <p>
+                            <div>
+                                <p>
                                     <strong>
                                         {{ music.Name }}
                                     </strong>
@@ -55,26 +58,26 @@ export default {
                     </li>
                 </ol>
             </div>
-        </div>
-
-    </div>
+        </template>
+    </Showcase>
 </template>
 
 <style scoped>
 .barcode {
     z-index: -1;
 }
+
 .barcode svg {
     width: 100%;
 }
-.showcase .cover-area img {}
 
-.showcase .meta {
-    display: grid;
-    align-self: flex-start;
+img.cover {
+  width: 256px;
+  height: 256px;
+  border: 1px solid white;
 }
 
-.showcase .meta li {
+li {
     padding: 0 0 0 0;
 }
 
@@ -83,6 +86,7 @@ export default {
     grid-column-start: 1;
     grid-column-end: 3;
 }
+
 .tracklist h2 {
     margin: 1em 0;
 }

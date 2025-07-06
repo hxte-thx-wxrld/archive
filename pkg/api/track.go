@@ -3,13 +3,27 @@ package api
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
+
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
+
+type TrackPresignedUploadResponse struct {
+	Url     string
+	TrackId string
+}
+
+type UploadedTrack struct {
+	TrackTitle string
+	ArtistId   string
+	PublicUrl  string
+}
 
 type MusicRow struct {
 	TrackId     string
@@ -103,13 +117,6 @@ func TrackApi(rg *gin.RouterGroup, db *pgxpool.Pool) {
 	ag := rg.Group("/track")
 
 	ag.GET("/", func(ctx *gin.Context) {
-		//p := ctx.Request.URL.Query().Get("p")
-		/*i, err := strconv.Atoi(p)
-
-		if err != nil {
-			i = 0
-		}*/
-
 		fullLength, err := GetTracksTotalCount(db)
 		if err != nil {
 			log.Println(err)
@@ -129,12 +136,62 @@ func TrackApi(rg *gin.RouterGroup, db *pgxpool.Pool) {
 		}
 	})
 
+	ag.POST("/presign", AuthenticatedMiddleware, func(ctx *gin.Context) {
+		new_id := uuid.New()
+		url, err := NewPresignUrl("tracks", new_id.String()+".wav")
+
+		if err != nil {
+			fmt.Println(err)
+			ctx.JSON(http.StatusInternalServerError, err)
+			return
+		}
+
+		fmt.Println(url)
+		ctx.JSON(http.StatusOK, TrackPresignedUploadResponse{
+			Url:     url,
+			TrackId: new_id.String(),
+		})
+	})
+
+	ag.POST("/:id", AuthenticatedMiddleware, func(ctx *gin.Context) {
+		id := ctx.Param("id")
+		if id == "" {
+			ctx.JSON(http.StatusBadRequest, errors.New("invalid track id"))
+			return
+		}
+
+		var req UploadedTrack
+
+		if err := ctx.BindJSON(&req); err != nil {
+			fmt.Println(err)
+			ctx.JSON(http.StatusBadRequest, err)
+			return
+		}
+
+		db.QueryRow(context.Background(), "INSERT INTO public.music (id, title, artist_id, public_url) VALUES(@TrackId, @Title, @ArtistId, @PublicUrl)", pgx.NamedArgs{
+			"TrackId":   id,
+			"Title":     req.TrackTitle,
+			"ArtistId":  req.ArtistId,
+			"PublicUrl": req.PublicUrl,
+		})
+
+		//err := row.Scan()
+
+		//if err != nil {
+		//	fmt.Println(err)
+		//	ctx.JSON(http.StatusInternalServerError, err)
+		//} else {
+		ctx.Status(http.StatusOK)
+		//}
+
+	})
 	ag.GET("/:id", func(ctx *gin.Context) {
 		id := ctx.Param("id")
 		if id == "" {
 			ctx.JSON(http.StatusBadRequest, errors.New("invalid track id"))
 			return
 		}
+
 		track, err := GetSingleTrack(db, id)
 
 		if err != nil {

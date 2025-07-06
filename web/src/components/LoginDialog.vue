@@ -2,20 +2,32 @@
 import { getDevPrefix } from '../main';
 
 export default {
+    data() {
+        return {
+            err: null
+        }
+    },
     methods: {
         async login(event: SubmitEvent) {
+            this.err = null
             const data = new FormData(event.target as HTMLFormElement);
 
-            const req = await fetch(getDevPrefix() + "/api/login", {
+            this.$store.dispatch("login", data).then(() => {
+                this.$emit("close")
+            }).catch((err) => {
+                this.err = "login unsuccessful"
+            })
+
+            /*const req = await fetch(getDevPrefix() + "/api/login", {
                 method: "POST",
                 credentials: 'include',
                 body: JSON.stringify({
                     username: data.get("username"),
                     password: data.get("password"),
                 })
-            })
+            })*/
 
-            if (req.ok) {
+            /*if (req.ok) {
                 console.log(req.ok)
                 //const json = await req.json();
 
@@ -25,7 +37,7 @@ export default {
                 })
 
                 console.log(await whoami.json());
-            }
+            }*/
         }
     }
 }
@@ -33,7 +45,8 @@ export default {
 
 <template>
     <form @submit.prevent="login">
-        <strong class="login-label">Login</strong>
+        <strong class="login-label whole-width">Login</strong>
+        <p class="whole-width" v-if="err != null">{{ err }}</p>
         <label for="username">Username:</label>
         <input type="text" name="username">
         <label for="password">Password:</label>
@@ -43,12 +56,15 @@ export default {
     </form>
 </template>
 
-<style>
+<style scoped>
 .login-label {
-    grid-column-start: 1;
-    grid-column-end: 3;
     font-size: 1.5em;
     margin: 0 0 1em 0;
+}
+
+.whole-width {
+    grid-column-start: 1;
+    grid-column-end: 3;
 }
 
 form input[type="submit"] {

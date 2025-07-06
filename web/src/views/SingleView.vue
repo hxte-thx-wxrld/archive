@@ -6,21 +6,24 @@ import ArtistShowcase from "../components/ArtistShowcase.vue";
 <script lang="ts">
 
 export default {
-    methods: {
-        getSubmode() {
+    computed: {
+        submode() {
             if (!this.$route.params.mode) {
                 return "tracks";
             } else return this.$route.params.mode;
         },
-        getObjectId() {
+        objectId() {
             return this.$route.params.id
+        },
+        createMode() {
+            return this.objectId == "create"
         }
-    }
+    },
 }
 </script>
 
 <template>
-    <div v-if="getSubmode() == 'tracks'">
+    <div v-if="submode == 'tracks'">
         <div class="mode-title-container">
 
             <h1 class="mode-title inverted icon tracks">Track</h1>
@@ -28,13 +31,13 @@ export default {
             <RouterLink to="/catalog/tracks">Back to Catalog</RouterLink>
         </div>
         <Suspense>
-            <TrackShowcase :track-id="getObjectId()" />
+            <TrackShowcase :editmode="createMode" :track-id="objectId" />
             <template #loading>
                 Loading...
             </template>
         </Suspense>
     </div>
-    <div v-if="getSubmode() == 'releases'">
+    <div v-if="submode == 'releases'">
         <div class="mode-title-container">
 
             <h1 class="mode-title inverted icon releases">Release</h1>
@@ -42,20 +45,20 @@ export default {
             <RouterLink to="/catalog/releases">Back to Catalog</RouterLink>
         </div>
         <Suspense>
-            <ReleaseShowcase :release-id="getObjectId()" />
+            <ReleaseShowcase :release-id="objectId" />
             <template #loading>
                 Loading...
             </template>
         </Suspense>
     </div>
-    <div v-if="getSubmode() == 'artists'">
+    <div v-if="submode == 'artists'">
         <div class="mode-title-container">
             <h1 class="mode-title inverted icon artists">Artist</h1>
             <img class="back-icon" src="../assets/arrow.png">
             <RouterLink to="/catalog/artists">Back to Catalog</RouterLink>
         </div>
         <Suspense>
-            <ArtistShowcase :artist-id="getObjectId()" />
+            <ArtistShowcase :artist-id="objectId" />
             <template #loading>
                 Loading...
             </template>

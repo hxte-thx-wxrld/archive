@@ -3,15 +3,33 @@ package api
 import (
 	"context"
 	"fmt"
+	"net/http"
 
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type UserLookupResult struct {
-	UserId   string
-	Username string
+	UserId          string
+	Username        string
+	AssignedArtists []Artist
+}
+
+func AuthenticatedMiddleware(ctx *gin.Context) {
+
+	session := sessions.Default(ctx)
+
+	id := session.Get("userid")
+	if id == nil {
+		ctx.Status(http.StatusUnauthorized)
+	} else {
+		ctx.Keys["userid"] = id.(string)
+		ctx.Next()
+	}
+
 }
 
 func LookupUser(db *pgxpool.Pool, userid string) (*UserLookupResult, error) {
@@ -26,6 +44,16 @@ func LookupUser(db *pgxpool.Pool, userid string) (*UserLookupResult, error) {
 		fmt.Println(err)
 		return nil, err
 	}
+
+	aa, err := GetAssignedArtists(db, userid)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	user.AssignedArtists = aa
+
+	fmt.Println(user)
 
 	return &user, nil
 }

@@ -11,7 +11,7 @@ export default {
 
 <template>
     <h1>Upload</h1>
-    <UploadComp />
+
 </template>
 
 <style>

@@ -5,7 +5,12 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -14,6 +19,31 @@ import (
 type LoginRequest struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
+}
+
+func NewPresignUrl(bucket string, key string) (string, error) {
+	sess, err := session.NewSession(&aws.Config{
+		Region:   aws.String("US"),
+		Endpoint: aws.String("http://127.0.0.1:8333"),
+
+		S3ForcePathStyle:              aws.Bool(true),
+		Credentials:                   credentials.NewSharedCredentials("", "default"),
+		CredentialsChainVerboseErrors: aws.Bool(true),
+	})
+	if err != nil {
+
+	}
+	aws.NewConfig()
+	svc := s3.New(sess)
+
+	req, _ := svc.GetObjectRequest(&s3.GetObjectInput{
+		Bucket: aws.String(bucket),
+		Key:    aws.String(key),
+	})
+	urlStr, err := req.Presign(15 * time.Minute)
+
+	//return Presigner{PresignClient: presignClient}
+	return urlStr, err
 }
 
 func InitApi(rg *gin.RouterGroup, db *pgxpool.Pool) {
@@ -65,6 +95,7 @@ func InitApi(rg *gin.RouterGroup, db *pgxpool.Pool) {
 		session := sessions.Default(ctx)
 		session.Delete("userid")
 		session.Save()
+		ctx.Status(http.StatusOK)
 	})
 
 	rg.POST("/login", func(ctx *gin.Context) {
@@ -77,8 +108,6 @@ func InitApi(rg *gin.RouterGroup, db *pgxpool.Pool) {
 			ctx.JSON(http.StatusBadRequest, err)
 			return
 		}
-
-		fmt.Println(req)
 
 		session := sessions.Default(ctx)
 		id, err := CheckPassword(db, req.Username, req.Password)

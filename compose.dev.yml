@@ -27,6 +27,7 @@ services:
     command: gow run /app/main.go
     volumes:
       - "./pkg:/app/pkg"
+      - "./aws:/root/.aws/"
     #ports:
     #  - 8080:8080
     environment:
@@ -57,7 +58,7 @@ services:
     volumes:
       #- "./db/base.sql:/docker-entrypoint-initdb.d/0-base.sql"
       - "./db/base.sql:/docker-entrypoint-initdb.d/0-base.sql"
-      #- "./db/data.sql:/docker-entrypoint-initdb.d/1-data.sql"
+      - "./db/data.sql:/docker-entrypoint-initdb.d/1-data.sql"
       - ./appdata/postgres:/var/lib/postgresql/data
     ports:
       - "5432:5432"
