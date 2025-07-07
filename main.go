@@ -21,6 +21,8 @@ func main() {
 		log.Println("Error loading .env file", err)
 	}
 
+	htwarchive.NewDefaultDaemon()
+
 	//config := htwarchive.DefaultServerConfig()
 	conn := htwarchive.InitDb()
 	htwarchive.Serve(conn, index_html, f)
