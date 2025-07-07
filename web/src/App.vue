@@ -2,6 +2,7 @@
 import { mapGetters } from 'vuex';
 import HelloWorld from './components/HelloWorld.vue'
 import LoginDialog from './components/dialogs/LoginDialog.vue'
+import { mapState } from 'vuex';
 
 </script>
 <script lang="ts">
@@ -16,6 +17,11 @@ export default {
     hideLoginModal(event) {
       (this.$refs.loginDialog as HTMLDialogElement).close();
     },
+  },
+  data() {
+    return {
+
+    }
   },
   computed: {
     ...mapGetters(["isLoggedIn"])
@@ -59,6 +65,8 @@ export default {
       <div v-else>
         <a href="#" @click.prevent="$store.dispatch('logout')">Logout</a>
         <span>{{ $store.Username }}</span>
+      </div>
+      <div>
       </div>
     </footer>
   </div>
@@ -229,7 +237,9 @@ input[type=submit] {
 }
 
 input[type=text],
-input[type=password] {
+input[type=password],
+input[type=date]
+ {
   font-family: inherit;
   font-size: inherit;
   color: white;
@@ -239,7 +249,9 @@ input[type=password] {
 }
 
 input[type=text].reverse,
-input[type=password].reverse {
+input[type=password].reverse,
+input[type=date].reverse
+ {
   background-color: white;
   border-bottom: 3px solid black;
   color: black;

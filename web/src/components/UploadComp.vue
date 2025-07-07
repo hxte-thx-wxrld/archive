@@ -50,7 +50,7 @@ export default {
         async createPresignedUrl() {
             const req = await fetch(this.$props.endpoint, {
                 method: "POST",
-                credentials: "include"
+                credentials: "include",
             });
 
             return await req.json();

@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import AssignedArtistsPicker from '../AssignedArtistsPicker.vue';
+import EditableText from '../EditableText.vue';
 import UploadComp from '../UploadComp.vue';
 </script>
 
@@ -40,10 +41,10 @@ export default {
         <h2 class="full-width">Create new Track</h2>
 
         <label for="TrackTitle">Trackname:</label>
-        <input type="text" name="TrackTitle">
+        <input type="text" class="reverse" name="TrackTitle">
 
         <label for="ReleaseDate">Release Date:</label>
-        <input type="date" name="ReleaseDate" :value="new Date()">
+        <EditableText :reverse-style="true" :edit="true" :value="String(new Date())" type="date" name="ReleaseDate"></EditableText>
 
         <label for="ArtistId">Artist:</label>
         <AssignedArtistsPicker />

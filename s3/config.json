@@ -4,7 +4,7 @@
       "name": "admin",
       "credentials": [{
         "accessKey": "admin",
-        "secretKey": "change_me"
+        "secretKey": "changeme"
       }],
       "actions": [
         "Admin",

@@ -6,7 +6,7 @@ import type { Artist } from "./types"
 export interface State {
   UserId: null | string
   Username: null | string
-  AssignedArtists: [Artist]
+  AssignedArtists: Artist[]
 }
 
 export const key: InjectionKey<Store<State>> = Symbol()
@@ -19,7 +19,7 @@ export const store = createStore<State>({
     },
     mutations: {
         setUserdata(state, data) {
-            console.table(data)
+            console.log(data)
             state.UserId = data.UserId
             state.Username = data.Username
             state.AssignedArtists = data.AssignedArtists
@@ -27,6 +27,7 @@ export const store = createStore<State>({
         removeUserdata(state) {
             state.UserId = null
             state.Username = null
+            state.AssignedArtists = []
         }
     },
     getters: {

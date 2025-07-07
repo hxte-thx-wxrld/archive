@@ -20,9 +20,11 @@ SET row_security = off;
 ALTER TABLE IF EXISTS ONLY public.music_in_releases DROP CONSTRAINT IF EXISTS music_in_releases_releases_fk;
 ALTER TABLE IF EXISTS ONLY public.music_in_releases DROP CONSTRAINT IF EXISTS music_in_releases_music_fk;
 ALTER TABLE IF EXISTS ONLY public.music DROP CONSTRAINT IF EXISTS music_artists_fk;
+ALTER TABLE IF EXISTS ONLY public.artists_of_user DROP CONSTRAINT IF EXISTS artists_of_user_users_fk;
+ALTER TABLE IF EXISTS ONLY public.artists_of_user DROP CONSTRAINT IF EXISTS artists_of_user_interpret_fk;
 DROP TRIGGER IF EXISTS trigger_set_catalog_id ON public.releases;
 DROP INDEX IF EXISTS public.music_filepath_idx;
-ALTER TABLE IF EXISTS ONLY public.users DROP CONSTRAINT IF EXISTS users_pk;
+ALTER TABLE IF EXISTS ONLY public.users DROP CONSTRAINT IF EXISTS users_unique;
 ALTER TABLE IF EXISTS ONLY public.tags DROP CONSTRAINT IF EXISTS tags_unique_1;
 ALTER TABLE IF EXISTS ONLY public.tags DROP CONSTRAINT IF EXISTS tags_unique;
 ALTER TABLE IF EXISTS ONLY public.releases DROP CONSTRAINT IF EXISTS releases_unique;
@@ -32,10 +34,12 @@ ALTER TABLE IF EXISTS ONLY public.music_in_releases DROP CONSTRAINT IF EXISTS mu
 ALTER TABLE IF EXISTS ONLY public.music_in_releases DROP CONSTRAINT IF EXISTS music_in_releases_pk;
 ALTER TABLE IF EXISTS ONLY public.interpret DROP CONSTRAINT IF EXISTS artists_unique;
 ALTER TABLE IF EXISTS ONLY public.interpret DROP CONSTRAINT IF EXISTS artists_pk;
+ALTER TABLE IF EXISTS ONLY public.artists_of_user DROP CONSTRAINT IF EXISTS artists_of_user_unique;
 ALTER TABLE IF EXISTS public.music_in_releases ALTER COLUMN id DROP DEFAULT;
 DROP TABLE IF EXISTS public.users;
 DROP TABLE IF EXISTS public.tags;
 DROP SEQUENCE IF EXISTS public.music_in_releases_id_seq;
+DROP TABLE IF EXISTS public.artists_of_user;
 DROP VIEW IF EXISTS public.all_tracks;
 DROP VIEW IF EXISTS public.published;
 DROP TABLE IF EXISTS public.releases;
@@ -46,14 +50,6 @@ DROP FUNCTION IF EXISTS public.set_catalog_id();
 DROP FUNCTION IF EXISTS public.create_catalog_id(id uuid);
 DROP TYPE IF EXISTS public.release_type;
 DROP EXTENSION IF EXISTS pgcrypto;
--- *not* dropping schema, since initdb creates it
---
--- Name: public; Type: SCHEMA; Schema: -; Owner: -
---
-
--- *not* creating schema, since initdb creates it
-
-
 --
 -- Name: SCHEMA public; Type: COMMENT; Schema: -; Owner: -
 --
@@ -142,7 +138,8 @@ CREATE TABLE public.music (
     public_url text,
     cover_url text DEFAULT '/covers/default.png'::text,
     length integer DEFAULT 0 NOT NULL,
-    bpm real DEFAULT 0.0 NOT NULL
+    bpm real DEFAULT 0.0 NOT NULL,
+    release_date date DEFAULT CURRENT_DATE NOT NULL
 );
 
 
@@ -206,7 +203,7 @@ CREATE VIEW public.all_tracks AS
     m.title AS tracktitle,
     i.name AS artist,
     p.catalog_no,
-    p.release_date,
+    m.release_date,
     m.public_url AS url,
     i.id AS artist_id,
     p.release_id,
@@ -218,6 +215,16 @@ CREATE VIEW public.all_tracks AS
    FROM ((public.music m
      JOIN public.interpret i ON ((i.id = m.artist_id)))
      LEFT JOIN public.published p ON ((p.track_id = m.id)));
+
+
+--
+-- Name: artists_of_user; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.artists_of_user (
+    user_id uuid NOT NULL,
+    artist_id uuid NOT NULL
+);
 
 
 --
@@ -266,6 +273,14 @@ CREATE TABLE public.users (
 --
 
 ALTER TABLE ONLY public.music_in_releases ALTER COLUMN id SET DEFAULT nextval('public.music_in_releases_id_seq'::regclass);
+
+
+--
+-- Name: artists_of_user artists_of_user_unique; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.artists_of_user
+    ADD CONSTRAINT artists_of_user_unique UNIQUE (user_id, artist_id);
 
 
 --
@@ -341,11 +356,11 @@ ALTER TABLE ONLY public.tags
 
 
 --
--- Name: users users_pk; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: users users_unique; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.users
-    ADD CONSTRAINT users_pk PRIMARY KEY (username);
+    ADD CONSTRAINT users_unique UNIQUE (id);
 
 
 --
@@ -360,6 +375,22 @@ CREATE UNIQUE INDEX music_filepath_idx ON public.music USING btree (filepath);
 --
 
 CREATE TRIGGER trigger_set_catalog_id BEFORE INSERT ON public.releases FOR EACH ROW EXECUTE FUNCTION public.set_catalog_id();
+
+
+--
+-- Name: artists_of_user artists_of_user_interpret_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.artists_of_user
+    ADD CONSTRAINT artists_of_user_interpret_fk FOREIGN KEY (artist_id) REFERENCES public.interpret(id);
+
+
+--
+-- Name: artists_of_user artists_of_user_users_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.artists_of_user
+    ADD CONSTRAINT artists_of_user_users_fk FOREIGN KEY (user_id) REFERENCES public.users(id);
 
 
 --

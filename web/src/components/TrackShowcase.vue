@@ -64,7 +64,7 @@ export default {
             </template>
             <template #default>
                 <h1 class="title">
-                    <EditableText :edit="edit" :value="data.Tracktitle" name="Tracktitle" type="text" />
+                    <EditableText :reverse-style="false" :edit="edit" :value="data.Tracktitle" name="Tracktitle" type="text" />
                 </h1>
                 <strong>Artist:</strong>
                 <RouterLink :to="'/catalog/artists/' + data.ArtistId" v-if="!edit">{{ data.Artist }}</RouterLink>
@@ -73,7 +73,7 @@ export default {
                 <span>{{ data.Length }}</span>
 
                 <strong>Track Releasedate:</strong>
-                <EditableText :edit="edit" :value="data.ReleaseDate" type="date" name="ReleaseDate"></EditableText>
+                <EditableText :reverse-style="false" :edit="edit" :value="data.ReleaseDate" type="date" name="ReleaseDate"></EditableText>
                 <strong>Release-Code: </strong>
                 <a v-if="data.ReleaseId != null" class="release-code" :href="'/catalog/releases/' + data.ReleaseId">{{
                     data.CatalogNo }}</a>

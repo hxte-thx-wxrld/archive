@@ -2,6 +2,7 @@ package main
 
 import (
 	"embed"
+	"fmt"
 	"log"
 
 	htwarchive "github.com/htw-archive/pkg"
@@ -21,9 +22,10 @@ func main() {
 		log.Println("Error loading .env file", err)
 	}
 
-	htwarchive.NewDefaultDaemon()
+	_ = htwarchive.DefaultDaemon()
 
 	//config := htwarchive.DefaultServerConfig()
 	conn := htwarchive.InitDb()
 	htwarchive.Serve(conn, index_html, f)
+	fmt.Println("post serve")
 }

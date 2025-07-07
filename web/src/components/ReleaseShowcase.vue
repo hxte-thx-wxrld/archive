@@ -49,13 +49,13 @@ export default {
         </template>
 
         <template #default>
-            <h1 class="title"><EditableText :edit="edit" :value="data.Name" type="text" name="Name"></EditableText></h1>
+            <h1 class="title"><EditableText :reverse-style="false" :edit="edit" :value="data.Name" type="text" name="Name"></EditableText></h1>
             <strong>Release Date:</strong>
-             <EditableText :edit="edit" :value="data.ReleaseDate" type="date" name="ReleaseDate"></EditableText>
+             <EditableText :reverse-style="false" :edit="edit" :value="data.ReleaseDate" type="date" name="ReleaseDate"></EditableText>
             <strong>Release-Code:</strong><span class="release-code">{{ data.CatalogId }}</span>
 
             <strong>ISRC-Code:</strong>
-            <EditableText :edit="edit" :value="data.Isrc" type="text" name="Isrc"></EditableText>
+            <EditableText :reverse-style="false" :edit="edit" :value="data.Isrc" type="text" name="Isrc"></EditableText>
 
             <div class="tracklist">
                 <h2>Track List</h2>

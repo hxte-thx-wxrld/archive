@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const props = defineProps<{
     edit: boolean
+    reverseStyle: boolean
     value: string
     type: string
     name: string
@@ -17,7 +18,7 @@ export default {
 
 <template>
 <span v-if="!edit">{{ value }}</span>
-<input :name="name" :type="type" :value="value" v-else>
+<input :class="{'reverse': reverseStyle}" :name="name" :type="type" :value="value" v-else>
 </template>
 
 <style scoped>

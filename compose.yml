@@ -32,6 +32,7 @@ services:
       #GIN_MODE: release
     volumes:
       - "./.env:/.env"
+      - ".:/app"
   weed:
     image: chrislusf/seaweedfs # use a remote image
     restart: always

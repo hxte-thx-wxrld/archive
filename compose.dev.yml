@@ -27,7 +27,7 @@ services:
     command: gow run /app/main.go
     volumes:
       - "./pkg:/app/pkg"
-      - "./aws:/root/.aws/"
+      - "./aws:/root/.aws"
     #ports:
     #  - 8080:8080
     environment:
