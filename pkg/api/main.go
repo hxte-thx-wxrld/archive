@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"net/url"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -71,9 +70,11 @@ func NewPresignUrl(bucket string, key string) (*string, error) {
 	presignClient := s3.NewPresignClient(svc)
 	req, err := presignClient.PresignPutObject(context.Background(), &s3.PutObjectInput{
 		ContentType: aws.String("audio/x-wav"),
-		Bucket:      aws.String(bucket),
-		Key:         aws.String(key),
-		Expires:     aws.Time(time.Now().Add(15 * time.Minute)),
+		//ContentLength: aws.Int64(0),
+		Bucket: aws.String(bucket),
+		Key:    aws.String(key),
+		//Expires: aws.Time(time.Now().Add(15 * time.Minute)),
+		Expires: aws.Time(time.Now().Add(3 * time.Hour)),
 	})
 	if err != nil {
 		log.Println(err)
@@ -82,15 +83,14 @@ func NewPresignUrl(bucket string, key string) (*string, error) {
 
 	fmt.Println(req)
 
-	u, err := url.Parse(req.URL)
+	/*u, err := url.Parse(req.URL)
 	if err != nil {
 		return nil, err
-	}
+	}*/
 
-	u.Host = "127.0.0.1:8333"
-	uu := u.String()
+	//u.Host = "127.0.0.1:8333"
 
-	return &uu, nil
+	return &req.URL, nil
 }
 
 func InitApi(rg *gin.RouterGroup, db *pgxpool.Pool) {
