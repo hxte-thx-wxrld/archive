@@ -45,7 +45,7 @@ services:
     volumes:
       #- "/mnt/hdd/seaweed:/data"
       - "./appdata/seaweed:/data"
-      - "./s3.json:/etc/seaweedfs/config.json"
+      - "./s3/config.json:/etc/seaweedfs/config.json"
 #      - "./filer.toml:/etc/seaweedfs/filer.toml"
 
 # Use postgres/example user/password credentials
