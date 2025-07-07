@@ -51,11 +51,11 @@ func InitApi(rg *gin.RouterGroup, db *pgxpool.Pool) {
 	ArtistApi(rg, db)
 	ReleaseApi(rg, db)
 
-	rg.GET("/me", func(ctx *gin.Context) {
+	rg.GET("/me", AuthenticatedMiddleware, func(ctx *gin.Context) {
 		session := sessions.Default(ctx)
 		id := session.Get("userid")
 		if id == nil {
-			ctx.Status(http.StatusUnauthorized)
+			ctx.Status(http.StatusInternalServerError)
 		} else {
 			fmt.Println(id)
 

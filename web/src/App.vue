@@ -103,8 +103,6 @@ header .top .action {
 footer {
   padding: 1em 0;
 }
-
-
 </style>
 
 <style>
@@ -123,12 +121,10 @@ footer {
   src: url("./assets/fonts/Web437_ApricotXenC.woff") format("woff");
 }
 
-@media
-  (resolution: 1dppx),
-  (resolution: 2dppx),
-  (resolution: 3dppx),
-  (resolution: 4dppx)
-{
+@media (resolution: 1dppx),
+(resolution: 2dppx),
+(resolution: 3dppx),
+(resolution: 4dppx) {
   body {
     font-smooth: never;
   }
@@ -136,13 +132,14 @@ footer {
 
 body {
   text-size-adjust: none;
-  
+
   -moz-osx-font-smoothing: none;
   -webkit-text-size-adjust: none;
   text-size-adjust: none;
 }
 
-h1, h2 {
+h1,
+h2 {
   font-family: "ApricotPortable";
 }
 
@@ -197,27 +194,31 @@ body {
 }
 
 .icon::before {
-    display: inline-block;
-    vertical-align:sub;
-    padding: 0 .5em;
-    width: 1em;
-    height: 1em;
+  display: inline-block;
+  vertical-align: sub;
+  padding: 0 .5em;
+  width: 1em;
+  height: 1em;
 }
 
 .icon.tracks::before {
-    content: url(./assets/music.svg);
+  content: url(./assets/music.svg);
 }
+
 .icon.releases::before {
-    content: url(./assets/cd.svg);
+  content: url(./assets/cd.svg);
 }
+
 .icon.artists::before {
-    content: url(./assets/artist.svg);
+  content: url(./assets/artist.svg);
 }
+
 .icon.inverted::before {
   filter: invert(1)
 }
 
-button, input[type=submit] {
+button,
+input[type=submit] {
   -webkit-appearance: none;
   background-color: white;
   border: 0;
@@ -225,6 +226,23 @@ button, input[type=submit] {
   color: black;
   padding: .5em;
   cursor: pointer;
+}
+
+input[type=text],
+input[type=password] {
+  font-family: inherit;
+  font-size: inherit;
+  color: white;
+  background-color: black;
+  border: 0;
+  border-bottom: 3px solid white;
+}
+
+input[type=text].reverse,
+input[type=password].reverse {
+  background-color: white;
+  border-bottom: 3px solid black;
+  color: black;
 }
 
 button:active {
@@ -275,7 +293,7 @@ button:active {
     padding: 0 5em;
   }
 
-    .top .logo {
+  .top .logo {
     width: 100%;
   }
 
@@ -295,7 +313,7 @@ button:active {
   .top .logo {
     width: 50%;
   }
-  
+
   header .top a {
     text-align: center;
   }

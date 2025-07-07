@@ -21,12 +21,5 @@ export default {
 </template>
 
 <style scoped>
-input {
-    font-family: inherit;
-    font-size: inherit;
-    color: white;
-    background-color: black;
-    border: 0;
-    border-bottom: 3px solid white;
-}
+
 </style>

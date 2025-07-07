@@ -1,3 +1,6 @@
+<script setup lang="ts">
+</script>
+
 <script lang="ts">
 import { getDevPrefix } from '../../main';
 
@@ -48,9 +51,9 @@ export default {
         <strong class="login-label whole-width">Login</strong>
         <p class="whole-width" v-if="err != null">{{ err }}</p>
         <label for="username">Username:</label>
-        <input type="text" name="username">
+        <input class="reverse" type="text" name="username">
         <label for="password">Password:</label>
-        <input type="password" name="password">
+        <input class="reverse"     type="password" name="password">
 
         <input type="submit">
     </form>

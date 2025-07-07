@@ -62,12 +62,9 @@ export default {
         <h1>Catalog</h1>
 
         <nav class="mode">
-            <RouterLink class="icon tracks" :class="getSubmode() == 'tracks' ? 'active' : ''" to="/catalog/tracks">
-                Tracks</RouterLink>
-            <RouterLink class="icon releases" :class="getSubmode() == 'releases' ? 'active' : ''"
-                to="/catalog/releases">Releases</RouterLink>
-            <RouterLink class="icon artists" :class="getSubmode() == 'artists' ? 'active' : ''" to="/catalog/artists">
-                Artists</RouterLink>
+            <RouterLink class="icon tracks" :class="getSubmode() == 'tracks' ? 'active' : ''" to="/catalog/tracks">Tracks</RouterLink>
+            <RouterLink class="icon releases" :class="getSubmode() == 'releases' ? 'active' : ''" to="/catalog/releases">Releases</RouterLink>
+            <RouterLink class="icon artists" :class="getSubmode() == 'artists' ? 'active' : ''" to="/catalog/artists">Artists</RouterLink>
             <a href="#" @click.prevent="showSearchbar = !showSearchbar">{{ showSearchbar ? "-" : "+" }}</a>
         </nav>
         <div class="tools" :class="showSearchbar ? '' : 'hide'">
