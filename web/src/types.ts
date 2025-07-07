@@ -1,4 +1,4 @@
-// generated using github.com/32leaves/bel on 2025-07-07 11:49:39.894861 +0200 CEST m=+0.004108501
+// generated using github.com/32leaves/bel on 2025-07-07 22:15:30.451844 +0200 CEST m=+0.006063917
 // DO NOT MODIFY
 
 export interface Artist {
@@ -6,7 +6,7 @@ export interface Artist {
     ArtistId: string
     ArtistPicture: string
 }
-// generated using github.com/32leaves/bel on 2025-07-07 11:49:39.89533 +0200 CEST m=+0.004577709
+// generated using github.com/32leaves/bel on 2025-07-07 22:15:30.453155 +0200 CEST m=+0.007374876
 // DO NOT MODIFY
 
 export interface Release {
@@ -18,7 +18,7 @@ export interface Release {
     CoverUrl: string
     RelatedMusic: MusicInRelease[]
 }
-// generated using github.com/32leaves/bel on 2025-07-07 11:49:39.895472 +0200 CEST m=+0.004719126
+// generated using github.com/32leaves/bel on 2025-07-07 22:15:30.453564 +0200 CEST m=+0.007784209
 // DO NOT MODIFY
 
 export interface MusicRow {
@@ -33,7 +33,7 @@ export interface MusicRow {
     CoverUrl: string
     Length: string
 }
-// generated using github.com/32leaves/bel on 2025-07-07 11:49:39.895607 +0200 CEST m=+0.004854584
+// generated using github.com/32leaves/bel on 2025-07-07 22:15:30.45385 +0200 CEST m=+0.008070417
 // DO NOT MODIFY
 
 export interface MusicInRelease {
@@ -42,11 +42,17 @@ export interface MusicInRelease {
     Order: number
     ArtistName: string
 }
-// generated using github.com/32leaves/bel on 2025-07-07 11:49:39.895711 +0200 CEST m=+0.004958459
+// generated using github.com/32leaves/bel on 2025-07-07 22:15:30.454073 +0200 CEST m=+0.008292709
 // DO NOT MODIFY
 
 export interface TrackEditRequest {
     Tracktitle: string
     ReleaseDate: string
     ArtistId: string
+}
+// generated using github.com/32leaves/bel on 2025-07-07 22:15:30.454328 +0200 CEST m=+0.008547834
+// DO NOT MODIFY
+
+export interface UploadedTrackResponse {
+    TrackId: string
 }

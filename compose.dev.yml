@@ -40,7 +40,7 @@ services:
     restart: always
     ports:
       - 8333:8333
-    command: "server -s3 -dir=/data -idleTimeout=0 -s3.config=/etc/seaweedfs/config.json"
+    command: "-v=3 server -s3 -dir=/data -idleTimeout=0 -s3.config=/etc/seaweedfs/config.json"
 
     volumes:
       #- "/mnt/hdd/seaweed:/data"

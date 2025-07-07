@@ -18,6 +18,12 @@ type UserLookupResult struct {
 	AssignedArtists []Artist
 }
 
+type CheckPasswordResponse struct {
+	UserId   string
+	Username string
+	Admin    bool
+}
+
 func AuthenticatedMiddleware(ctx *gin.Context) {
 
 	session := sessions.Default(ctx)
@@ -80,14 +86,14 @@ func CreateUser(db *pgxpool.Pool, username string, password string) (*string, er
 	return &id, nil
 }
 
-func CheckPassword(db *pgxpool.Pool, username string, password string) (*string, error) {
-	row := db.QueryRow(context.Background(), "select id, password_hash from users where username = @username", pgx.NamedArgs{
+func CheckPassword(db *pgxpool.Pool, username string, password string) (*CheckPasswordResponse, error) {
+	row := db.QueryRow(context.Background(), "select id, admin, password_hash from users where username = @username", pgx.NamedArgs{
 		"username": username,
 	})
 
-	var id string
+	var u CheckPasswordResponse
 	var hash []byte
-	err := row.Scan(&id, &hash)
+	err := row.Scan(&u.UserId, &u.Admin, &hash)
 	if err != nil {
 		return nil, err
 	}
@@ -96,7 +102,8 @@ func CheckPassword(db *pgxpool.Pool, username string, password string) (*string,
 	if err != nil {
 		return nil, err
 	} else {
-		return &id, nil
+		u.Username = username
+		return &u, nil
 	}
 
 }

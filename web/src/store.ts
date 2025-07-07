@@ -6,6 +6,7 @@ import type { Artist } from "./types"
 export interface State {
   UserId: null | string
   Username: null | string
+  Admin: boolean,
   AssignedArtists: Artist[]
 }
 
@@ -15,6 +16,7 @@ export const store = createStore<State>({
     state: {
         UserId: null,
         Username: null,
+        Admin: false,
         AssignedArtists: []
     },
     mutations: {
@@ -22,17 +24,22 @@ export const store = createStore<State>({
             console.log(data)
             state.UserId = data.UserId
             state.Username = data.Username
+            state.Admin = data.Admin
             state.AssignedArtists = data.AssignedArtists
         },
         removeUserdata(state) {
             state.UserId = null
             state.Username = null
+            state.Admin = false
             state.AssignedArtists = []
         }
     },
     getters: {
         isLoggedIn(state) {
             return state.UserId != null
+        },
+        isAdmin(state) {
+            return state.UserId != null && state.Admin
         }
     },
     actions: {

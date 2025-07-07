@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { hash } from '../hash';
 const props = defineProps<{
     endpoint: string,
     mime: string
@@ -33,22 +34,29 @@ export default {
                 throw new Error(`Only ${this.mime} files are supported`)
             }
 
-            const res = await this.createPresignedUrl();
+            const f = await file.bytes()
 
-            const upload = await fetch(res.Url, {
+            //const res = await this.createPresignedUrl(h, f.length);
+
+
+            /*const upload = await fetch(res.Url, {
+                credentials: "same-origin",
                 method: "PUT",
-                body: file
+                body: file,
+                headers: {
+                    "ContentLength": String(f.length)
+                }
             })
 
             if (upload.ok) {
 
                 this.file = res;
                 this.active = false
-            }
+            }*/
 
         },
-        async createPresignedUrl() {
-            const req = await fetch(this.$props.endpoint, {
+        async createPresignedUrl(h, len) {
+            const req = await fetch(this.$props.endpoint + "?hash=" + btoa(h), {
                 method: "POST",
                 credentials: "include",
             });

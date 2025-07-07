@@ -8,6 +8,7 @@ import TrackList from '../components/TrackList.vue';
 import TrackUploadDialog from '../components/dialogs/TrackUploadDialog.vue';
 import ArtistCreateDialog from '../components/dialogs/ArtistCreateDialog.vue';
 import ReleaseCreateDialog from '../components/dialogs/ReleaseCreateDialog.vue';
+import DatabaseList from '../components/DatabaseList.vue';
 
 const showSearchbar = ref(false)
 </script>
@@ -15,7 +16,7 @@ const showSearchbar = ref(false)
 <script lang="ts">
 export default {
     computed: {
-        ...mapGetters(["isLoggedIn"])
+        ...mapGetters(["isLoggedIn", "isAdmin"])
     },
     methods: {
         getSubmode() {
@@ -51,6 +52,9 @@ export default {
             console.log(item)
             this.$router.push('/catalog/artists/' + item.ArtistId)
             //:to="'/catalog/tracks/' + item.TrackId"
+        },
+        openInbox() {
+            alert("inbox")
         }
     }
 }
@@ -62,9 +66,12 @@ export default {
         <h1>Catalog</h1>
 
         <nav class="mode">
-            <RouterLink class="icon tracks" :class="getSubmode() == 'tracks' ? 'active' : ''" to="/catalog/tracks">Tracks</RouterLink>
-            <RouterLink class="icon releases" :class="getSubmode() == 'releases' ? 'active' : ''" to="/catalog/releases">Releases</RouterLink>
-            <RouterLink class="icon artists" :class="getSubmode() == 'artists' ? 'active' : ''" to="/catalog/artists">Artists</RouterLink>
+            <RouterLink class="icon tracks" :class="getSubmode() == 'tracks' ? 'active' : ''" to="/catalog/tracks">
+                Tracks</RouterLink>
+            <RouterLink class="icon releases" :class="getSubmode() == 'releases' ? 'active' : ''"
+                to="/catalog/releases">Releases</RouterLink>
+            <RouterLink class="icon artists" :class="getSubmode() == 'artists' ? 'active' : ''" to="/catalog/artists">
+                Artists</RouterLink>
             <a href="#" @click.prevent="showSearchbar = !showSearchbar">{{ showSearchbar ? "-" : "+" }}</a>
         </nav>
         <div class="tools" :class="showSearchbar ? '' : 'hide'">
@@ -75,32 +82,47 @@ export default {
 
 
     <div v-if="getSubmode() == 'tracks'">
-        <p>
+        <div class="catalog-toolbar">
             <a class="add-action" href="#" @click.prevent="openCreateTrack" v-if="isLoggedIn">Add New</a>
-        </p>
+            <a class="open-inbox" href="#" data-count="1" @click.prevent="$router.push('/catalog/track-inbox')">Inbox</a>
+        </div>
         <Suspense>
-            <TrackList :small="false" :show-cover="true" @trackSelect="openTrack"/>
+            <TrackList :small="false" :show-cover="true" @trackSelect="openTrack" />
             <template #fallback>
                 Loading...
             </template>
         </Suspense>
 
     </div>
-    <div v-else-if="getSubmode() == 'releases'">
-        <p>
-            <a class="add-action" href="#" @click.prevent="openCreateRelease" v-if="isLoggedIn">Add New</a>
-        </p>
+    <div v-if="getSubmode() == 'track-inbox'">
+        <h1>Inbox</h1>
+        <RouterLink class="icon tracks" to="/catalog/tracks">Go back</RouterLink>
         <Suspense>
-            <ReleaseList @releaseSelect="openRelease"/>
+            <DatabaseList ref="inboxlist" >
+                <!--<div class="row" v-for="(item, index) in $refs.inboxlist.Rows" v-if="data != null">
+                    {{ item }}
+                </div>-->
+            </DatabaseList>
+        </Suspense>
+    </div>
+    <div v-else-if="getSubmode() == 'releases'">
+        <div class="catalog-toolbar">
+
+            <a class="add-action" href="#" @click.prevent="openCreateRelease" v-if="isLoggedIn">Add New</a>
+        </div>
+        <Suspense>
+            <ReleaseList @releaseSelect="openRelease" />
             <template #fallback>
                 Loading...
             </template>
         </Suspense>
     </div>
     <div v-else-if="getSubmode() == 'artists'">
-        <a href="#" @click.prevent="openCreateArtist" v-if="isLoggedIn">Add New</a>
+        <div class="catalog-toolbar">
+            <a href="#" @click.prevent="openCreateArtist" v-if="isLoggedIn">Add New</a>
+        </div>
         <Suspense>
-            <ArtistList @artistSelect="openArtist"/>
+            <ArtistList @artistSelect="openArtist" />
             <template #fallback>
                 Loading...
             </template>
@@ -121,6 +143,16 @@ export default {
 </template>
 
 <style scoped>
+.catalog-toolbar {
+    display: flex;
+    padding: 1em 0;
+    justify-content: space-between;
+}
+
+a.open-inbox::before {
+    content: "(" attr(data-count) ")"
+}
+
 h1 {
     padding: 1em 0;
 }

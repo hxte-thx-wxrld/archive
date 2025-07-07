@@ -11,6 +11,7 @@ func main() {
 	OutputStruct(api.MusicRow{})
 	OutputStruct(api.MusicInRelease{})
 	OutputStruct(api.TrackEditRequest{})
+	OutputStruct(api.UploadedTrackResponse{})
 }
 
 func OutputStruct(s interface{}) {

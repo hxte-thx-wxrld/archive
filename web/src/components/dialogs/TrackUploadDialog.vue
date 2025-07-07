@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import type { UploadedTrackResponse } from '../../types';
 import AssignedArtistsPicker from '../AssignedArtistsPicker.vue';
 import EditableText from '../EditableText.vue';
 import UploadComp from '../UploadComp.vue';
@@ -10,22 +11,25 @@ export default {
         async uploadTrack(event: SubmitEvent) {
             //const req = await fetch("")
             const fdata = new FormData((event.target as HTMLFormElement))
-            const d = {
+            /*const d = {
                 "TrackTitle": fdata.get("TrackTitle"),
                 "ArtistId": fdata.get("ArtistId"),
                 "PublicUrl": fdata.get("PublicUrl"),
-            };
+            };*/
 
-            console.log(d);
 
-            const track = await fetch("/api/track/" + fdata.get("TrackId"), {
+            const track = await fetch("/api/track/", {
                 method: "POST",
                 credentials: "include",
-                body: JSON.stringify(d)
+                body: fdata
+
+                //body: JSON.stringify(d)
             })
 
             if (track.ok) {
-                this.$router.push("/catalog/tracks/" + fdata.get("TrackId"))
+                const r = await track.json() as UploadedTrackResponse
+                console.log(r)
+                //this.$router.push("/catalog/tracks/" + r.TrackId)
             }
         }
     },
@@ -48,10 +52,18 @@ export default {
 
         <label for="ArtistId">Artist:</label>
         <AssignedArtistsPicker />
+        
+        <label for="AudioFile">
+            Audio File:
+        </label>
+        <input type="file" name="AudioFile">
 
-        <div class="full-width">
-            <UploadComp endpoint="/api/track/presign" mime="audio/x-wav" />
-        </div>
+<!--
+    <div class="full-width">
+        <UploadComp endpoint="/api/track/presign" mime="audio/x-wav" />
+    </div>
+    -->
+
 
         <input type="submit">
     </form>

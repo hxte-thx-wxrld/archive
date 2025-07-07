@@ -25,6 +25,7 @@ func Serve(conn *pgxpool.Pool, index_html []byte, f embed.FS) {
 	defer conn.Close()
 
 	r.SetTrustedProxies([]string{"172.16.0.0/12"})
+	r.MaxMultipartMemory = 157286400
 
 	store := cookie.NewStore(([]byte("secret")))
 	store.Options(sessions.Options{

@@ -34,7 +34,7 @@ func postgresListener() {
 		},
 	}
 
-	listener.Handle("testchannel", pgxlisten.HandlerFunc(func(ctx context.Context, notification *pgconn.Notification, conn *pgx.Conn) error {
+	listener.Handle("track_upload", pgxlisten.HandlerFunc(func(ctx context.Context, notification *pgconn.Notification, conn *pgx.Conn) error {
 		fmt.Println("message on testchannel", notification)
 		//testchannel <- notification
 		return nil
