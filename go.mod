@@ -8,6 +8,7 @@ require (
 )
 
 require (
+	github.com/jackc/pgxlisten v0.0.0-20241106001234-1d6f6656415c // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/kr/text v0.2.0 // indirect
 )
