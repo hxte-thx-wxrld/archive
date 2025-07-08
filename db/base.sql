@@ -17,12 +17,17 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
+ALTER TABLE IF EXISTS ONLY public.uploads DROP CONSTRAINT IF EXISTS uploads_interpret_fk;
+ALTER TABLE IF EXISTS ONLY public.music_links DROP CONSTRAINT IF EXISTS music_links_music_fk;
 ALTER TABLE IF EXISTS ONLY public.music_in_releases DROP CONSTRAINT IF EXISTS music_in_releases_releases_fk;
 ALTER TABLE IF EXISTS ONLY public.music_in_releases DROP CONSTRAINT IF EXISTS music_in_releases_music_fk;
 ALTER TABLE IF EXISTS ONLY public.music DROP CONSTRAINT IF EXISTS music_artists_fk;
 ALTER TABLE IF EXISTS ONLY public.artists_of_user DROP CONSTRAINT IF EXISTS artists_of_user_users_fk;
 ALTER TABLE IF EXISTS ONLY public.artists_of_user DROP CONSTRAINT IF EXISTS artists_of_user_interpret_fk;
+DROP TRIGGER IF EXISTS upload_track_trigger ON public.uploads;
 DROP TRIGGER IF EXISTS trigger_set_catalog_id ON public.releases;
+DROP INDEX IF EXISTS public.uploads_id_idx;
+DROP INDEX IF EXISTS public.music_links_id_idx;
 DROP INDEX IF EXISTS public.music_filepath_idx;
 ALTER TABLE IF EXISTS ONLY public.users DROP CONSTRAINT IF EXISTS users_unique;
 ALTER TABLE IF EXISTS ONLY public.tags DROP CONSTRAINT IF EXISTS tags_unique_1;
@@ -35,9 +40,13 @@ ALTER TABLE IF EXISTS ONLY public.music_in_releases DROP CONSTRAINT IF EXISTS mu
 ALTER TABLE IF EXISTS ONLY public.interpret DROP CONSTRAINT IF EXISTS artists_unique;
 ALTER TABLE IF EXISTS ONLY public.interpret DROP CONSTRAINT IF EXISTS artists_pk;
 ALTER TABLE IF EXISTS ONLY public.artists_of_user DROP CONSTRAINT IF EXISTS artists_of_user_unique;
+ALTER TABLE IF EXISTS public.music_links ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS public.music_in_releases ALTER COLUMN id DROP DEFAULT;
 DROP TABLE IF EXISTS public.users;
+DROP TABLE IF EXISTS public.uploads;
 DROP TABLE IF EXISTS public.tags;
+DROP SEQUENCE IF EXISTS public.music_links_id_seq;
+DROP TABLE IF EXISTS public.music_links;
 DROP SEQUENCE IF EXISTS public.music_in_releases_id_seq;
 DROP TABLE IF EXISTS public.artists_of_user;
 DROP VIEW IF EXISTS public.all_tracks;
@@ -47,7 +56,9 @@ DROP TABLE IF EXISTS public.music_in_releases;
 DROP TABLE IF EXISTS public.music;
 DROP TABLE IF EXISTS public.interpret;
 DROP FUNCTION IF EXISTS public.set_catalog_id();
+DROP FUNCTION IF EXISTS public.notify_daemon_on_track_upload();
 DROP FUNCTION IF EXISTS public.create_catalog_id(id uuid);
+DROP TYPE IF EXISTS public.uploads_status;
 DROP TYPE IF EXISTS public.release_type;
 DROP EXTENSION IF EXISTS pgcrypto;
 --
@@ -83,6 +94,15 @@ CREATE TYPE public.release_type AS ENUM (
 
 
 --
+-- Name: uploads_status; Type: TYPE; Schema: public; Owner: -
+--
+
+CREATE TYPE public.uploads_status AS ENUM (
+    'waiting'
+);
+
+
+--
 -- Name: create_catalog_id(uuid); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -91,6 +111,23 @@ CREATE FUNCTION public.create_catalog_id(id uuid) RETURNS text
     AS $$
 	BEGIN
 	return concat('HTW', upper(left(encode(digest(id::text, 'sha256'::text), 'hex'::text), 8)));
+	END;
+$$;
+
+
+--
+-- Name: notify_daemon_on_track_upload(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.notify_daemon_on_track_upload() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+	BEGIN
+		
+		perform case when OLD.status = 'waiting'
+		then pg_notify('track_upload', OLD.id::text)
+		END;
+		RETURN OLD;
 	END;
 $$;
 
@@ -248,6 +285,38 @@ ALTER SEQUENCE public.music_in_releases_id_seq OWNED BY public.music_in_releases
 
 
 --
+-- Name: music_links; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.music_links (
+    id integer NOT NULL,
+    linklabel text NOT NULL,
+    url text NOT NULL,
+    trackid uuid NOT NULL
+);
+
+
+--
+-- Name: music_links_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.music_links_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: music_links_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.music_links_id_seq OWNED BY public.music_links.id;
+
+
+--
 -- Name: tags; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -258,13 +327,31 @@ CREATE TABLE public.tags (
 
 
 --
+-- Name: uploads; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.uploads (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    type text DEFAULT 'audio'::text NOT NULL,
+    uri text,
+    trackname text NOT NULL,
+    release_date date NOT NULL,
+    artistid uuid NOT NULL,
+    createdby uuid NOT NULL,
+    createdat timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    status public.uploads_status DEFAULT 'waiting'::public.uploads_status NOT NULL
+);
+
+
+--
 -- Name: users; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.users (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
     username text NOT NULL,
-    password_hash bytea NOT NULL
+    password_hash bytea NOT NULL,
+    admin boolean DEFAULT false NOT NULL
 );
 
 
@@ -273,6 +360,13 @@ CREATE TABLE public.users (
 --
 
 ALTER TABLE ONLY public.music_in_releases ALTER COLUMN id SET DEFAULT nextval('public.music_in_releases_id_seq'::regclass);
+
+
+--
+-- Name: music_links id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.music_links ALTER COLUMN id SET DEFAULT nextval('public.music_links_id_seq'::regclass);
 
 
 --
@@ -371,10 +465,31 @@ CREATE UNIQUE INDEX music_filepath_idx ON public.music USING btree (filepath);
 
 
 --
+-- Name: music_links_id_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX music_links_id_idx ON public.music_links USING btree (id);
+
+
+--
+-- Name: uploads_id_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX uploads_id_idx ON public.uploads USING btree (id);
+
+
+--
 -- Name: releases trigger_set_catalog_id; Type: TRIGGER; Schema: public; Owner: -
 --
 
 CREATE TRIGGER trigger_set_catalog_id BEFORE INSERT ON public.releases FOR EACH ROW EXECUTE FUNCTION public.set_catalog_id();
+
+
+--
+-- Name: uploads upload_track_trigger; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER upload_track_trigger AFTER INSERT OR UPDATE ON public.uploads FOR EACH ROW EXECUTE FUNCTION public.notify_daemon_on_track_upload();
 
 
 --
@@ -415,6 +530,22 @@ ALTER TABLE ONLY public.music_in_releases
 
 ALTER TABLE ONLY public.music_in_releases
     ADD CONSTRAINT music_in_releases_releases_fk FOREIGN KEY (release_id) REFERENCES public.releases(id);
+
+
+--
+-- Name: music_links music_links_music_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.music_links
+    ADD CONSTRAINT music_links_music_fk FOREIGN KEY (trackid) REFERENCES public.music(id);
+
+
+--
+-- Name: uploads uploads_interpret_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.uploads
+    ADD CONSTRAINT uploads_interpret_fk FOREIGN KEY (artistid) REFERENCES public.interpret(id);
 
 
 --
