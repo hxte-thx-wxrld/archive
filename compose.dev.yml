@@ -27,13 +27,20 @@ services:
     command: gow run /app/main.go
     volumes:
       - "./pkg:/app/pkg"
+      - "./scripts:/app/scripts"
+      - "./main.go:/app/main.go"
       - "./aws:/root/.aws"
     #ports:
     #  - 8080:8080
     environment:
       PG_URL: postgres://pguser:pgpassword@db:5432/pguser?search_path=public
       S3_ENDPOINT: http://127.0.0.1:8333
-    env_file: .env
+      WORKER_PG_HOST: db
+      WORKER_PG_PORT: 5432
+      WORKER_PG_DATABASE: pguser
+      WORKER_PG_USER: pguser
+      WORKER_PG_PASSWORD: pgpassword
+      WORKER_PG_SCHEMA: public
 
   weed:
     image: chrislusf/seaweedfs # use a remote image

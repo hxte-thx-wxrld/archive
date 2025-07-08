@@ -35,12 +35,13 @@ func InitApi(rg *gin.RouterGroup, db *pgxpool.Pool) {
 	TrackApi(rg, db)
 	ArtistApi(rg, db)
 	ReleaseApi(rg, db)
+	FileInboxApi(rg, db)
 
-	rg.GET("/me", AuthenticatedMiddleware, func(ctx *gin.Context) {
+	rg.GET("/me", func(ctx *gin.Context) {
 		session := sessions.Default(ctx)
 		id := session.Get("userid")
 		if id == nil {
-			ctx.Status(http.StatusInternalServerError)
+			ctx.JSON(http.StatusOK, nil)
 		} else {
 			fmt.Println(id)
 

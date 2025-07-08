@@ -8,7 +8,8 @@ import TrackList from '../components/TrackList.vue';
 import TrackUploadDialog from '../components/dialogs/TrackUploadDialog.vue';
 import ArtistCreateDialog from '../components/dialogs/ArtistCreateDialog.vue';
 import ReleaseCreateDialog from '../components/dialogs/ReleaseCreateDialog.vue';
-import DatabaseList from '../components/DatabaseList.vue';
+import DatabaseList from '../components/mixins/DatabaseList.vue';
+import DatabaseListItem from '../components/lists/InboxListMixin.vue';
 
 const showSearchbar = ref(false)
 </script>
@@ -80,11 +81,10 @@ export default {
         </div>
     </div>
 
-
     <div v-if="getSubmode() == 'tracks'">
-        <div class="catalog-toolbar">
+        <div class="catalog-toolbar" v-if="isLoggedIn">
             <a class="add-action" href="#" @click.prevent="openCreateTrack" v-if="isLoggedIn">Add New</a>
-            <a class="open-inbox" href="#" data-count="1" @click.prevent="$router.push('/catalog/track-inbox')">Inbox</a>
+            <a class="open-inbox" href="#" data-count="1" @click.prevent="$router.push('/catalog/track-inbox')" v-if="isAdmin">Inbox</a>
         </div>
         <Suspense>
             <TrackList :small="false" :show-cover="true" @trackSelect="openTrack" />
@@ -96,12 +96,14 @@ export default {
     </div>
     <div v-if="getSubmode() == 'track-inbox'">
         <h1>Inbox</h1>
-        <RouterLink class="icon tracks" to="/catalog/tracks">Go back</RouterLink>
+        <RouterLink class="icon tracks" to="/catalog/tracks" v-if="isAdmin">Go back</RouterLink>
         <Suspense>
-            <DatabaseList ref="inboxlist" >
+            <DatabaseList api-endpoint="/api/inbox/" :small="true">
+                <DatabaseListItem></DatabaseListItem>
                 <!--<div class="row" v-for="(item, index) in $refs.inboxlist.Rows" v-if="data != null">
                     {{ item }}
                 </div>-->
+
             </DatabaseList>
         </Suspense>
     </div>

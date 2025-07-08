@@ -15,6 +15,7 @@ import (
 type UserLookupResult struct {
 	UserId          string
 	Username        string
+	Admin           bool
 	AssignedArtists []Artist
 }
 
@@ -39,14 +40,24 @@ func AuthenticatedMiddleware(ctx *gin.Context) {
 
 }
 
+func AdminMiddleware(ctx *gin.Context) {
+	session := sessions.Default(ctx)
+	admin := session.Get("admin").(bool)
+	if admin {
+		ctx.Next()
+	} else {
+		ctx.Status(http.StatusUnauthorized)
+	}
+}
+
 func LookupUser(db *pgxpool.Pool, userid string) (*UserLookupResult, error) {
-	row := db.QueryRow(context.Background(), "select username from users where id = @userid", pgx.NamedArgs{
+	row := db.QueryRow(context.Background(), "select username, admin from users where id = @userid", pgx.NamedArgs{
 		"userid": userid,
 	})
 
 	var user UserLookupResult
 	user.UserId = userid
-	err := row.Scan(&user.Username)
+	err := row.Scan(&user.Username, &user.Admin)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err

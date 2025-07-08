@@ -21,11 +21,13 @@ export const store = createStore<State>({
     },
     mutations: {
         setUserdata(state, data) {
-            console.log(data)
-            state.UserId = data.UserId
-            state.Username = data.Username
-            state.Admin = data.Admin
-            state.AssignedArtists = data.AssignedArtists
+            if (data) {    
+                console.log(data)
+                state.UserId = data.UserId
+                state.Username = data.Username
+                state.Admin = data.Admin
+                state.AssignedArtists = data.AssignedArtists
+            }
         },
         removeUserdata(state) {
             state.UserId = null
@@ -39,7 +41,7 @@ export const store = createStore<State>({
             return state.UserId != null
         },
         isAdmin(state) {
-            return state.UserId != null && state.Admin
+            return state.Admin == true
         }
     },
     actions: {

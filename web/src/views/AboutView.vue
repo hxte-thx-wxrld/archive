@@ -1,3 +1,18 @@
+<script setup lang="ts">
+import InboxListMixin from '../components/lists/InboxListMixin.vue';
+import DatabaseList from '../components/mixins/DatabaseList.vue';
+
+async function acceptInboxItem(item) {
+    console.log(item)
+    const req = await fetch("/api/inbox/" + item + "/accept", {
+        credentials: "include"
+    })
+
+
+    console.log(req)
+}
+</script>
+
 <script lang="ts">
 export default {
 
@@ -6,6 +21,12 @@ export default {
 
 <template>
     <h1>About</h1>
+
+        <Suspense>
+            <DatabaseList :small="false" api-endpoint="/api/inbox">
+                <InboxListMixin @track-select="acceptInboxItem"></InboxListMixin>
+            </DatabaseList>
+        </Suspense>
 </template>
 
 <style scoped></style>

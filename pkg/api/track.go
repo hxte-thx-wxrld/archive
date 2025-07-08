@@ -85,7 +85,7 @@ func registerUpload(db *pgxpool.Pool, req UploadedTrack, fileobj multipart.File,
 
 	fmt.Println(o)
 
-	_ = db.QueryRow(context.Background(), "update uploads set uri='s3://inbox/track/' || id where id = @id", pgx.NamedArgs{
+	_ = db.QueryRow(context.Background(), "update uploads set uri='/inbox/track/' || id where id = @id", pgx.NamedArgs{
 		"id": objId,
 	})
 

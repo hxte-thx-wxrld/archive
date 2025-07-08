@@ -1,50 +1,44 @@
 <script setup lang="ts">
 import { mapGetters } from 'vuex'
-import { getDevPrefix } from '../main'
-import CreateTrackDialog from './dialogs/TrackUploadDialog.vue'
-import Paginator from './Paginator.vue'
-import type { MusicRow } from '../types'
-import { ref } from 'vue';
-
-const data = ref<
-    {
-        //Rows: MusicRow[],
-        FullLength: number,
-    }>();
+import { getDevPrefix } from '../../main'
+import CreateTrackDialog from '../dialogs/TrackUploadDialog.vue'
+import Paginator from '../Paginator.vue'
+import type { MusicRow, PaginatedInboxItems } from '../../types'
+import { provide, ref } from 'vue';
 
 const page = ref<number>(0);
 
 const props = defineProps<{
     //showCover: boolean,
-    //small: boolean,
+    apiEndpoint: string,
+    small: boolean,
 }>();
 
-/*const emit = defineEmits<{
-    'trackSelect': [MusicRow]
-}>()*/
+const Rows = ref([])
+const FullLength = ref(0)
 
-const Rows = []
+provide("Rows", Rows)
 
-const e = defineExpose({
-    Rows
-})
-
-async function reloadList(page) {
-    const req = await fetch(getDevPrefix() + "/api/track/?offset=" + page)
+async function reloadList(page): Promise<PaginatedInboxItems> {
+    const req = await fetch(getDevPrefix() + props.apiEndpoint + "?offset=" + page)
     const j = await req.json();
     console.table(j.Rows);
     return j;
 }
 
-function switchPage(i: number) {
+async function switchPage(i: number) {
     console.log(i)
     page.value = i
-    reloadList(page.value).then(d => {
-        data.value = d
+    const j = reloadList(page.value)
+}
+
+function applyList() {
+    reloadList(page.value).then(e => {
+        Rows.value = e.Rows
     })
 }
 
-e.Rows.value = await reloadList(page.value)
+applyList()
 
 </script>
 <script lang="ts">
@@ -64,7 +58,7 @@ export default {
 </script>
 
 <template>
-    <div class="browse-list" :class="{ 'small': small }">
+    <div class="browse-list" :class="{ 'small': props.small }">
         <slot></slot>
 
         <!--
@@ -96,8 +90,8 @@ export default {
                 </div>
             </div>
             <div v-else>No Data</div>
-            <Paginator :pagecount="data.FullLength" :page="page" @switchPage="switchPage" />
-        -->
+            -->
+            <Paginator :pagecount="FullLength" :page="page" @switchPage="switchPage" />
     </div>
 
 </template>

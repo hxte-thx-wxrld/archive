@@ -1,48 +1,19 @@
 <script setup lang="ts">
 import { mapGetters } from 'vuex'
-import { getDevPrefix } from '../main'
-import Paginator from './Paginator.vue'
-import type { MusicRow } from '../types'
-import { ref } from 'vue';
+import { getDevPrefix } from '../../main'
+import CreateTrackDialog from '../dialogs/TrackUploadDialog.vue'
 
-const data = ref<
-    {
-        Rows: MusicRow[],
-        FullLength: number,
-    }>();
+import { inject, ref } from 'vue';
+import type { MusicRow } from '../../types';
 
-const page = ref<number>(0);
-
-const props = defineProps<{
-    showCover: boolean,
-    small: boolean,
-}>();
-
+const Rows = inject<MusicRow[]>("Rows")
 const emit = defineEmits<{
     'trackSelect': [MusicRow]
 }>()
 
-async function reloadList(page) {
-    const req = await fetch(getDevPrefix() + "/api/track/?offset=" + page)
-    const j = await req.json();
-    console.table(j.Rows);
-    return j;
-}
-
-function switchPage(i: number) {
-    console.log(i)
-    page.value = i
-    reloadList(page.value).then(d => {
-        data.value = d
-    })
-}
-
-data.value = await reloadList(page.value)
-
 </script>
+
 <script lang="ts">
-
-
 export default {
     methods: {
 
@@ -57,8 +28,8 @@ export default {
 </script>
 
 <template>
-    <div class="browse-list" :class="{ 'small': small }">
-        <div class="row" v-for="(item, index) in data.Rows" v-if="data != null">
+
+        <div class="row" v-for="(item, index) in Rows">
             <div class="cover-area" v-if="showCover">
                 <img :src="'http://s3.rillo.internal:8333' + item.CoverUrl">
             </div>
@@ -85,9 +56,6 @@ export default {
 
             </div>
         </div>
-        <div v-else>No Data</div>
-        <Paginator :pagecount="data.FullLength" :page="page" @switchPage="switchPage" />
-    </div>
 
 </template>
 

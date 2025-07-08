@@ -98,7 +98,10 @@ CREATE TYPE public.release_type AS ENUM (
 --
 
 CREATE TYPE public.uploads_status AS ENUM (
-    'waiting'
+    'waiting',
+    'accepted',
+    'analyzing',
+    'finished'
 );
 
 
