@@ -63,6 +63,7 @@ func registerUpload(db *pgxpool.Pool, req UploadedTrack, fileobj multipart.File,
 	}
 
 	defer tx.Rollback(context.Background())
+
 	rows := db.QueryRow(context.Background(), "INSERT INTO uploads (trackname, release_date, artistId, createdby) VALUES (@Title, @ReleaseDate::date, @ArtistId, @CreatedBy) returning id::text", pgx.NamedArgs{
 		"Title":       req.TrackTitle,
 		"ArtistId":    req.ArtistId,

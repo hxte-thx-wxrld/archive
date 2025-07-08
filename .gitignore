@@ -5,3 +5,5 @@ dump-*.sql
 appdata/
 daemon/database.ini
 aws
+.venv
+__pycache__/
