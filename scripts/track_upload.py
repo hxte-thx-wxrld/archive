@@ -21,7 +21,7 @@ with tempfile.NamedTemporaryFile() as tfile:
     y, sr = librosa.load(tfile.name)
 
     features = {
-        "tempo": librosa.beat.tempo(y=y, sr=sr)[0],
+        "tempo": librosa.feature.tempo(y=y, sr=sr)[0],
         "zcr": np.mean(librosa.feature.zero_crossing_rate(y)),
         "rms": np.mean(librosa.feature.rms(y=y)),
         "centroid": np.mean(librosa.feature.spectral_centroid(y=y, sr=sr)),
@@ -29,11 +29,15 @@ with tempfile.NamedTemporaryFile() as tfile:
         "flatness": np.mean(librosa.feature.spectral_flatness(y=y)),
         "mfcc": np.mean(librosa.feature.mfcc(y=y, sr=sr, n_mfcc=13), axis=1).tolist(),
     }
+    
     print(features)
     
     c.upload_fileobj(tfile, "tracks", args.trackId + ".wav")
     cur.execute("INSERT INTO music (id, title, artist_id, public_url, release_date) VALUES(%s, %s, %s, %s, %s)", (args.trackId, data[1], data[3], "/tracks/" + args.trackId + ".wav", data[2]))
     print("Inserted into music library")
+    
+    cur.execute("INSERT INTO public.analysis (trackid, tempo, zcr, rms, centroid, rolloff, flatness) VALUES(%s, %s, %s, %s, %s, %s, %s)", (args.trackId, features["tempo"].item(), features["zcr"].item(), features["rms"].item(), features["centroid"].item(), features["rolloff"].item(), features["flatness"].item()))
+    print("Inserted Analysis Data")
     
     cur.execute("UPDATE public.uploads SET status='finished' WHERE id::text = %s", (args.trackId,))
     conn.commit()

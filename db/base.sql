@@ -24,11 +24,13 @@ ALTER TABLE IF EXISTS ONLY public.music_in_releases DROP CONSTRAINT IF EXISTS mu
 ALTER TABLE IF EXISTS ONLY public.music DROP CONSTRAINT IF EXISTS music_artists_fk;
 ALTER TABLE IF EXISTS ONLY public.artists_of_user DROP CONSTRAINT IF EXISTS artists_of_user_users_fk;
 ALTER TABLE IF EXISTS ONLY public.artists_of_user DROP CONSTRAINT IF EXISTS artists_of_user_interpret_fk;
+ALTER TABLE IF EXISTS ONLY public.analysis DROP CONSTRAINT IF EXISTS analysis_music_fk;
 DROP TRIGGER IF EXISTS upload_track_trigger ON public.uploads;
 DROP TRIGGER IF EXISTS trigger_set_catalog_id ON public.releases;
 DROP INDEX IF EXISTS public.uploads_id_idx;
 DROP INDEX IF EXISTS public.music_links_id_idx;
 DROP INDEX IF EXISTS public.music_filepath_idx;
+DROP INDEX IF EXISTS public.analysis_trackid_idx;
 ALTER TABLE IF EXISTS ONLY public.users DROP CONSTRAINT IF EXISTS users_unique;
 ALTER TABLE IF EXISTS ONLY public.tags DROP CONSTRAINT IF EXISTS tags_unique_1;
 ALTER TABLE IF EXISTS ONLY public.tags DROP CONSTRAINT IF EXISTS tags_unique;
@@ -49,6 +51,7 @@ DROP SEQUENCE IF EXISTS public.music_links_id_seq;
 DROP TABLE IF EXISTS public.music_links;
 DROP SEQUENCE IF EXISTS public.music_in_releases_id_seq;
 DROP TABLE IF EXISTS public.artists_of_user;
+DROP TABLE IF EXISTS public.analysis;
 DROP VIEW IF EXISTS public.all_tracks;
 DROP VIEW IF EXISTS public.published;
 DROP TABLE IF EXISTS public.releases;
@@ -258,6 +261,21 @@ CREATE VIEW public.all_tracks AS
 
 
 --
+-- Name: analysis; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.analysis (
+    trackid uuid NOT NULL,
+    tempo double precision DEFAULT 0.0,
+    zcr double precision,
+    rms real,
+    centroid double precision,
+    rolloff double precision,
+    flatness real
+);
+
+
+--
 -- Name: artists_of_user; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -461,6 +479,13 @@ ALTER TABLE ONLY public.users
 
 
 --
+-- Name: analysis_trackid_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX analysis_trackid_idx ON public.analysis USING btree (trackid);
+
+
+--
 -- Name: music_filepath_idx; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -493,6 +518,14 @@ CREATE TRIGGER trigger_set_catalog_id BEFORE INSERT ON public.releases FOR EACH 
 --
 
 CREATE TRIGGER upload_track_trigger AFTER INSERT OR UPDATE ON public.uploads FOR EACH ROW EXECUTE FUNCTION public.notify_daemon_on_track_upload();
+
+
+--
+-- Name: analysis analysis_music_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.analysis
+    ADD CONSTRAINT analysis_music_fk FOREIGN KEY (trackid) REFERENCES public.music(id);
 
 
 --

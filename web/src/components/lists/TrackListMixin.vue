@@ -8,7 +8,7 @@ import type { MusicRow } from '../../types';
 
 const Rows = inject<MusicRow[]>("Rows")
 const emit = defineEmits<{
-    'trackSelect': [MusicRow]
+    'trackSelect': MusicRow[]
 }>()
 
 </script>
