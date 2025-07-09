@@ -3,10 +3,10 @@ import { mapGetters } from 'vuex'
 import { getDevPrefix } from '../main'
 import CreateArtistDialog from './dialogs/ArtistCreateDialog.vue'
 import { ref } from 'vue';
-import type { Artist } from '../types'
+import type { Artist, PaginatedArtistLookup } from '../types'
 
-const data = ref<[Artist]>(null);
-const req = await fetch(getDevPrefix() + "/api/artist/")
+const data = ref<PaginatedArtistLookup>();
+const req = await fetch(getDevPrefix() + "/api/artist?offset=0")
 data.value = await req.json()
 
 console.log(data.value)
@@ -31,7 +31,7 @@ export default {
 <template>
 
     <div class="browse-list">
-        <div class="row" v-for="(item, index) in data">
+        <div class="row" v-for="(item, index) in data.Rows">
             <div class="cover-area">
                 <img :src="'http://s3.rillo.internal:8333' + item.ArtistPicture">
             </div>

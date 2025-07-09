@@ -2,18 +2,18 @@ package main
 
 import (
 	"github.com/32leaves/bel"
-	"github.com/htw-archive/pkg/api"
+	"github.com/htw-archive/pkg/model"
 )
 
 func main() {
-	OutputStruct(api.Artist{})
-	OutputStruct(api.Release{})
-	OutputStruct(api.MusicRow{})
-	OutputStruct(api.MusicInRelease{})
-	OutputStruct(api.TrackEditRequest{})
-	OutputStruct(api.UploadedTrackResponse{})
-	OutputStruct(api.InboxItem{})
-	OutputStruct(api.PaginatedInboxItems{})
+	OutputStruct(model.PaginatedArtistLookup{})
+	OutputStruct(model.Artist{})
+	OutputStruct(model.Music{})
+	OutputStruct(model.Release{})
+	OutputStruct(model.MusicInRelease{})
+
+	OutputStruct(model.InboxItem{})
+	OutputStruct(model.PaginatedInboxItems{})
 }
 
 func OutputStruct(s interface{}) {

@@ -1,14 +1,11 @@
 package api
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"log"
 	"net/http"
 
-	"github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -17,18 +14,6 @@ import (
 type LoginRequest struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
-}
-
-func NewS3Config() (*s3.Client, error) {
-	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion("US"))
-	if err != nil {
-		log.Println(err)
-		return nil, err
-	}
-
-	return s3.NewFromConfig(cfg, func(o *s3.Options) {
-		o.UsePathStyle = true
-	}), nil
 }
 
 func InitApi(rg *gin.RouterGroup, db *pgxpool.Pool) {
@@ -43,7 +28,7 @@ func InitApi(rg *gin.RouterGroup, db *pgxpool.Pool) {
 		if id == nil {
 			ctx.JSON(http.StatusOK, nil)
 		} else {
-			fmt.Println(id)
+			//fmt.Println(id)
 
 			id = id.(string)
 

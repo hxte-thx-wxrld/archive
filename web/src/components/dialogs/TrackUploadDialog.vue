@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import type { UploadedTrackResponse } from '../../types';
 import AssignedArtistsPicker from '../AssignedArtistsPicker.vue';
 import EditableText from '../EditableText.vue';
 import UploadComp from '../UploadComp.vue';
@@ -18,7 +17,7 @@ export default {
             };*/
 
 
-            const track = await fetch("/api/track/", {
+            const track = await fetch("/api/inbox", {
                 method: "POST",
                 credentials: "include",
                 body: fdata
@@ -27,7 +26,7 @@ export default {
             })
 
             if (track.ok) {
-                const r = await track.json() as UploadedTrackResponse
+                const r = await track.json()
                 console.log(r)
                 //this.$router.push("/catalog/tracks/" + r.TrackId)
             }
@@ -44,8 +43,8 @@ export default {
 
         <h2 class="full-width">Create new Track</h2>
 
-        <label for="TrackTitle">Trackname:</label>
-        <input type="text" class="reverse" name="TrackTitle">
+        <label for="Trackname">Trackname:</label>
+        <input type="text" class="reverse" name="Trackname">
 
         <label for="ReleaseDate">Release Date:</label>
         <EditableText :reverse-style="true" :edit="true" :value="String(new Date())" type="date" name="ReleaseDate"></EditableText>

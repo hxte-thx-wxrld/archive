@@ -23,11 +23,7 @@ export default {
 <template>
     <h1>About</h1>
 
-        <Suspense>
-            <DatabaseList :small="false" api-endpoint="/api/inbox">
-                <InboxListMixin @track-select="acceptInboxItem"></InboxListMixin>
-            </DatabaseList>
-        </Suspense>
+
 </template>
 
 <style scoped></style>

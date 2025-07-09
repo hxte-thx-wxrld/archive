@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
-import type { MusicRow } from '../../types';
+import type { Music } from '../../types';
 import TrackList from '../TrackList.vue';
 
-const selection = ref<MusicRow[]>([])
+const selection = ref<Music[]>([])
 const assignform = ref<HTMLFormElement>();
 
 const emit = defineEmits<{
@@ -19,6 +19,7 @@ function save(event: MouseEvent) {
     const fdata = new FormData(assignform.value as HTMLFormElement);
     const ids = fdata.getAll("TrackId").map((v, i) => v.toString());
     emit('save', ids)
+
     //emit('save', { data: selection.value })
 }
 

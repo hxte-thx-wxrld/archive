@@ -3,7 +3,7 @@ import { mapGetters } from 'vuex'
 import { getDevPrefix } from '../../main'
 import CreateTrackDialog from '../dialogs/TrackUploadDialog.vue'
 import Paginator from '../Paginator.vue'
-import type { MusicRow, PaginatedInboxItems } from '../../types'
+import type { Music, PaginatedInboxItems } from '../../types'
 import { provide, ref } from 'vue';
 
 const page = ref<number>(0);

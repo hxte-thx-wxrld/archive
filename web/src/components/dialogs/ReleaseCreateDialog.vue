@@ -9,13 +9,13 @@ export default {
     },
     methods: {
         async create(event: SubmitEvent) {
-            /*const body = new FormData(event.target as HTMLFormElement)
+            const body = new FormData(event.target as HTMLFormElement)
             const req = await fetch("/api/artist", {
                 method: "POST",
                 body: JSON.stringify({
                     "Name": body.get("name")
                 })
-            })*/
+            })
 
         }
     }

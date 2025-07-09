@@ -4,12 +4,12 @@ import { getDevPrefix } from '../main'
 import Showcase from './Showcase.vue';
 import EditableText from './EditableText.vue';
 import { ref } from 'vue';
-import type { MusicRow, TrackEditRequest } from '../types';
+import type { Music } from '../types';
 import { mapGetters } from 'vuex';
 import AssignedArtistsPicker from './AssignedArtistsPicker.vue';
 import { router } from '../router';
 
-async function fetchData(trackId): Promise<MusicRow> {
+async function fetchData(trackId): Promise<Music> {
 
     const req = await fetch(getDevPrefix() + "/api/track/" + trackId)
     return req.json()
@@ -17,7 +17,7 @@ async function fetchData(trackId): Promise<MusicRow> {
 async function save(event: SubmitEvent) {
     const fdata = new FormData(event.target as HTMLFormElement);
 
-    const data: TrackEditRequest = {
+    const data = {
         Tracktitle: fdata.get("Tracktitle").toString(),
         ReleaseDate: fdata.get("ReleaseDate").toString(),
         ArtistId: fdata.get("ArtistId").toString()
@@ -37,7 +37,7 @@ const props = defineProps({
     "edit": Boolean
 });
 const edit = ref(false)
-const data = ref<MusicRow>();
+const data = ref<Music>();
 
 data.value = await fetchData(props.trackId)
 

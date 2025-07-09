@@ -4,16 +4,16 @@ import { getDevPrefix } from '../../main'
 import CreateTrackDialog from '../dialogs/TrackUploadDialog.vue'
 
 import { inject, ref } from 'vue';
-import type { MusicRow } from '../../types';
+import type { Music } from '../../types';
 
 const props = defineProps<{
     small: boolean
     showCover: boolean
 }>()
 
-const Rows = inject<MusicRow[]>("Rows")
+const Rows = inject<Music[]>("Rows")
 const emit = defineEmits<{
-    'trackSelect': MusicRow[]
+    'trackSelect': Music[]
 }>()
 
 </script>

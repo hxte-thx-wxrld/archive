@@ -129,6 +129,37 @@ footer {
   src: url("./assets/fonts/Web437_ApricotXenC.woff") format("woff");
 }
 
+@font-face {
+  font-family: "Bytesized-Regular";
+  src: url("./assets/fonts/Bytesized-Regular.ttf")
+}
+
+@font-face {
+  font-family: "DotGothic16";
+  src: url("./assets/fonts/DotGothic16-Regular.ttf")
+}
+
+@font-face {
+  font-family: "PixelifySans";
+  src: url("./assets/fonts/PixelifySans-Regular.ttf");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "PixelifySans";
+  src: url("./assets/fonts/PixelifySans-Bold.ttf");
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Silkscreen";
+  src: url("./assets/fonts/Silkscreen-Regular.ttf");
+  font-weight: normal;
+  font-style: normal;
+}
+
 @media (resolution: 1dppx),
 (resolution: 2dppx),
 (resolution: 3dppx),
@@ -148,7 +179,7 @@ body {
 
 h1,
 h2 {
-  font-family: "ApricotPortable";
+  font-family: "Silkscreen";
 }
 
 p,

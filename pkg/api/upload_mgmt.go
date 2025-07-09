@@ -1,67 +1,77 @@
 package api
 
 import (
-	"context"
 	"fmt"
+	"mime/multipart"
 	"net/http"
 
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
-	"github.com/jackc/pgx/v5"
+	"github.com/htw-archive/pkg/model"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-// SELECT uri, trackname, artistid, createdby, createdat, status FROM uploads where id = @UploadId and status = 'waiting';
+func FileInboxApi(rg *gin.RouterGroup, db *pgxpool.Pool) {
+	ag := rg.Group("/inbox", AuthenticatedMiddleware)
 
-type InboxItem struct {
-	UploadId  string
-	Uri       string
-	Trackname string
-	ArtistId  string
-	CreatedBy string
-	CreatedAt string
-	Status    string
-}
+	ag.POST("/", func(ctx *gin.Context) {
+		sess := sessions.Default(ctx)
+		userid := sess.Get("userid").(string)
+		admin := sess.Get("admin").(bool)
 
-type PaginatedInboxItems struct {
-	Rows       []InboxItem
-	FullLength int
-}
+		fmt.Println("is admin", admin)
 
-func acceptUpload(db *pgxpool.Pool, UploadId string) {
-	_ = db.QueryRow(context.Background(), "update uploads set status='accepted' where id = @id", pgx.NamedArgs{
-		"id": UploadId,
-	})
-}
-
-func GetInbox(db *pgxpool.Pool) ([]InboxItem, error) {
-	row, err := db.Query(context.Background(), "SELECT id, uri, trackname, artistid, createdby, createdat::text, status FROM uploads where status = 'waiting';", pgx.NamedArgs{})
-	if err != nil {
-		fmt.Println(err)
-		return nil, err
-	}
-	defer row.Close()
-
-	var items []InboxItem
-
-	for row.Next() {
-		var item InboxItem
-		err = row.Scan(&item.UploadId, &item.Uri, &item.Trackname, &item.ArtistId, &item.CreatedBy, &item.CreatedAt, &item.Status)
+		form, err := ctx.MultipartForm()
 		if err != nil {
 			fmt.Println(err)
-			return nil, err
+			ctx.JSON(http.StatusBadRequest, err)
+			return
 		}
 
-		items = append(items, item)
-	}
+		var t model.InboxItem
+		err = ctx.Bind(&t)
 
-	return items, nil
-}
+		if err != nil {
+			fmt.Println(err)
+			ctx.JSON(http.StatusBadRequest, err)
+			return
+		}
+		t.CreatedBy = userid
 
-func FileInboxApi(rg *gin.RouterGroup, db *pgxpool.Pool) {
-	ag := rg.Group("/inbox", AuthenticatedMiddleware, AdminMiddleware)
+		fmt.Println(t)
 
-	ag.GET("/", func(ctx *gin.Context) {
-		inbox, err := GetInbox(db)
+		var tmpaudio multipart.File
+
+		for _, file := range form.File["AudioFile"] {
+
+			//if file.Header.Get("Content-Type") == "audio/x-wav" {
+
+			tmpaudio, err = file.Open()
+			if err != nil {
+				fmt.Println(err)
+				ctx.JSON(http.StatusBadRequest, err)
+				return
+			}
+
+			break
+			//}
+
+		}
+
+		err = t.RegisterUpload(db, tmpaudio, admin)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, err)
+		}
+
+		ctx.JSON(http.StatusOK, t)
+	})
+
+	ag.GET("/", AdminMiddleware, func(ctx *gin.Context) {
+		i := model.PaginatedInboxItems{}
+		err := i.AllWaitingInboxItems(db, 0)
+		fmt.Println(i)
+
+		//inbox, err := GetInbox(db)
 
 		if err != nil {
 			fmt.Println(err)
@@ -69,20 +79,21 @@ func FileInboxApi(rg *gin.RouterGroup, db *pgxpool.Pool) {
 			return
 		}
 
-		ctx.JSON(http.StatusOK, PaginatedInboxItems{
-			Rows:       inbox,
-			FullLength: 0,
-		})
+		ctx.JSON(http.StatusOK, i)
 	})
 
-	ag.GET("/:id/accept", func(ctx *gin.Context) {
+	ag.GET("/:id/accept", AdminMiddleware, func(ctx *gin.Context) {
 		id := ctx.Param("id")
 		if id == "" {
 			ctx.Status(http.StatusBadRequest)
 			return
 		}
 
-		acceptUpload(db, id)
+		item := model.InboxItem{
+			UploadId: id,
+		}
+		item.Accept(db)
+
 		ctx.Status(http.StatusOK)
 	})
 }

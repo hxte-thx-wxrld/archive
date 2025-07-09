@@ -5,7 +5,7 @@ import type { Release } from '../types';
 import { ref } from 'vue';
 
 async function reloadList(page) {
-    const req = await fetch(getDevPrefix() + "/api/release/")
+    const req = await fetch(getDevPrefix() + "/api/release?offset=0")
     return await req.json()
 }
 

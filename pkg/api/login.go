@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/gin-contrib/sessions"
@@ -51,6 +52,32 @@ func AdminMiddleware(ctx *gin.Context) {
 	}
 }
 
+func GetAssignedArtists(db *pgxpool.Pool, userid string) ([]Artist, error) {
+	rows, err := db.Query(context.Background(), "select i.id as ArtistId, i.name from artists_of_user aou join interpret i on i.id = aou.artist_id where aou.user_id::text = @userId", pgx.NamedArgs{
+		"userId": userid,
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	var a []Artist
+	for rows.Next() {
+		var artist Artist
+
+		err := rows.Scan(&artist.ArtistId, &artist.Name)
+		if err != nil {
+			log.Println(err)
+			return nil, err
+		}
+
+		fmt.Println(artist)
+
+		a = append(a, artist)
+	}
+	return a, nil
+}
+
 func LookupUser(db *pgxpool.Pool, userid string) (*UserLookupResult, error) {
 	row := db.QueryRow(context.Background(), "select username, admin from users where id = @userid", pgx.NamedArgs{
 		"userid": userid,
@@ -72,7 +99,7 @@ func LookupUser(db *pgxpool.Pool, userid string) (*UserLookupResult, error) {
 
 	user.AssignedArtists = aa
 
-	fmt.Println(user)
+	//fmt.Println(user)
 
 	return &user, nil
 }

@@ -2,12 +2,12 @@
 import { mapGetters } from 'vuex'
 import { getDevPrefix } from '../main'
 import Paginator from './Paginator.vue'
-import type { MusicRow } from '../types'
+import type { Music } from '../types'
 import { ref } from 'vue';
 
 const data = ref<
     {
-        Rows: MusicRow[],
+        Rows: Music[],
         FullLength: number,
     }>();
 
@@ -19,7 +19,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-    'trackSelect': [MusicRow]
+    'trackSelect': [Music]
 }>()
 
 async function reloadList(page) {
