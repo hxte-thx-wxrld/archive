@@ -96,4 +96,13 @@ func FileInboxApi(rg *gin.RouterGroup, db *pgxpool.Pool) {
 
 		ctx.Status(http.StatusOK)
 	})
+
+	ag.GET("/count", AdminMiddleware, func(ctx *gin.Context) {
+		c, err := model.GetInboxCount(db)
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		ctx.JSON(http.StatusOK, c)
+	})
 }

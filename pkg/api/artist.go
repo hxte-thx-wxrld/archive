@@ -10,14 +10,9 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/htw-archive/pkg/model"
+
 	"github.com/jackc/pgx/v5/pgxpool"
 )
-
-type Artist struct {
-	Name          string
-	ArtistId      *string
-	ArtistPicture string
-}
 
 func ArtistApi(rg *gin.RouterGroup, db *pgxpool.Pool) {
 	ag := rg.Group("/artist")

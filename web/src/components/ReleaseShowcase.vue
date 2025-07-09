@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { mapGetters } from 'vuex';
-import { getDevPrefix } from '../main'
+import { getDevPrefix, getS3Host } from '../main'
 import Showcase from './Showcase.vue';
 import EditableText from './EditableText.vue';
 
 import AssignTracksReleaseDialog from './dialogs/AssignTracksReleaseDialog.vue';
 import { ref } from 'vue';
-import type { Release } from '../types';
+import type { Music, Release } from '../types';
 
 function addTrackToRelease(event: MouseEvent) {
     assigndialog.value.showModal()
@@ -42,20 +42,25 @@ export default {
 <template>
     <Showcase>
         <template #left>
-            <img class="cover" :src="'http://s3.rillo.internal:8333' + data.CoverUrl">
+            <img class="cover" :src="getS3Host() + data.CoverUrl">
             <div class="barcode">
                 <vue-barcode :value="data.CatalogId" :options="{ displayValue: true }" tag="svg"></vue-barcode>
             </div>
         </template>
 
         <template #default>
-            <h1 class="title"><EditableText :reverse-style="false" :edit="edit" :value="data.Name" type="text" name="Name"></EditableText></h1>
+            <h1 class="title">
+                <EditableText :reverse-style="false" :edit="edit" :value="data.Name" type="text" name="Name">
+                </EditableText>
+            </h1>
             <strong>Release Date:</strong>
-             <EditableText :reverse-style="false" :edit="edit" :value="data.ReleaseDate" type="date" name="ReleaseDate"></EditableText>
+            <EditableText :reverse-style="false" :edit="edit" :value="data.ReleaseDate" type="date" name="ReleaseDate">
+            </EditableText>
             <strong>Release-Code:</strong><span class="release-code">{{ data.CatalogId }}</span>
 
             <strong>ISRC-Code:</strong>
-            <EditableText :reverse-style="false" :edit="edit" :value="data.Isrc" type="text" name="Isrc"></EditableText>
+            <EditableText :reverse-style="false" :edit="edit" :value="data.Isrc ?? '-'" type="text" name="Isrc">
+            </EditableText>
 
             <div class="tracklist">
                 <h2>Track List</h2>
@@ -80,12 +85,13 @@ export default {
                         Add Track to Release
                     </a>
                 </ol>
+                
             </div>
 
             <div class="actionbuttons">
 
                 <button type="button" @click.prevent="edit = !edit" v-if="isLoggedIn">{{ edit ? "Cancel" : "Edit"
-                }}</button>
+                    }}</button>
                 <input type="submit" v-if="edit && isLoggedIn">
             </div>
         </template>
@@ -100,6 +106,7 @@ export default {
     display: flex;
     gap: 1em;
 }
+
 #add_tracks_to_release {
     width: 50%;
 }
@@ -135,11 +142,7 @@ li {
     grid-column-end: 3;
 }
 
-.tracklist h2 {
+.tracklist h2 {}
 
-}
-
-.tracklist li {
-
-}
+.tracklist li {}
 </style>

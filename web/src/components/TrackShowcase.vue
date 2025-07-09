@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useRouter, useRoute } from 'vue-router'
-import { getDevPrefix } from '../main'
+import { getDevPrefix, getS3Host } from '../main'
 import Showcase from './Showcase.vue';
 import EditableText from './EditableText.vue';
 import { ref } from 'vue';
@@ -60,7 +60,7 @@ export default {
 
         <Showcase>
             <template #left>
-                <img class="cover" :src="'http://s3.rillo.internal:8333' + data.CoverUrl">
+                <img class="cover" :src="getS3Host() + data.CoverUrl">
             </template>
             <template #default>
                 <h1 class="title">

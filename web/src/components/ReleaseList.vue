@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { getDevPrefix } from '../main'
+import { getDevPrefix, getS3Host } from '../main'
 import MockTracks from '../mock/all_tracks.json'
 import type { Release } from '../types';
 import { ref } from 'vue';
@@ -32,7 +32,7 @@ export default {
     <div class="browse-list">
         <div class="row" v-for="(item, index) in data.Rows" v-if="data != null">
             <div class="cover-area">
-                <img :src="'http://s3.rillo.internal:8333' + item.CoverUrl">
+                <img :src="getS3Host() + item.CoverUrl">
             </div>
 
             <div class="name-area">

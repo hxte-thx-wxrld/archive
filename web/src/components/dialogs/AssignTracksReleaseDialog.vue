@@ -7,7 +7,7 @@ const selection = ref<Music[]>([])
 const assignform = ref<HTMLFormElement>();
 
 const emit = defineEmits<{
-    'save': [string[]],
+    'save': [Music[]],
     'close': []
 }>()
 
@@ -17,8 +17,8 @@ function addToSelection(item) {
 
 function save(event: MouseEvent) {
     const fdata = new FormData(assignform.value as HTMLFormElement);
-    const ids = fdata.getAll("TrackId").map((v, i) => v.toString());
-    emit('save', ids)
+    //const ids = fdata.getAll("key").map((v, i) => v.toString());
+    emit('save', selection.value)
 
     //emit('save', { data: selection.value })
 }
@@ -49,7 +49,7 @@ function cancel() {
                             <p>
                                 {{ item.Artist }}
                             </p>
-                            <input type="hidden" name="TrackId" :value="item.TrackId">
+                            <input type="hidden" name="key" :value="index">
                         </div>
                     </li>
                 </ul>

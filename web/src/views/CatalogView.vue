@@ -11,6 +11,7 @@ import ReleaseCreateDialog from '../components/dialogs/ReleaseCreateDialog.vue';
 import DatabaseList from '../components/mixins/DatabaseList.vue';
 import DatabaseListItem from '../components/lists/InboxListMixin.vue';
 import TrackListMixin from '../components/lists/TrackListMixin.vue';
+import InboxIndicator from '../components/InboxIndicator.vue';
 
 const showSearchbar = ref(false)
 </script>
@@ -85,13 +86,13 @@ export default {
     <div v-if="getSubmode() == 'tracks'">
         <div class="catalog-toolbar" v-if="isLoggedIn">
             <a class="add-action" href="#" @click.prevent="openCreateTrack" v-if="isLoggedIn">Add New</a>
-            <a class="open-inbox" href="#" data-count="1" @click.prevent="$router.push('/catalog/track-inbox')" v-if="isAdmin">Inbox</a>
+            <!-- <a class="open-inbox" href="#" data-count="1" @click.prevent="$router.push('/catalog/track-inbox')" v-if="isAdmin">Inbox</a> -->
+            <Suspense v-if="isAdmin">
+                <InboxIndicator></InboxIndicator>
+            </Suspense>
         </div>
         <Suspense>
-
-            
-
-                <TrackList :small="false" :show-cover="true" @trackSelect="openTrack" />
+            <TrackList :small="false" :show-cover="true" @trackSelect="openTrack" />
 
             <template #fallback>
                 Loading...
@@ -154,10 +155,6 @@ export default {
     display: flex;
     padding: 1em 0;
     justify-content: space-between;
-}
-
-a.open-inbox::before {
-    content: "(" attr(data-count) ")"
 }
 
 h1 {

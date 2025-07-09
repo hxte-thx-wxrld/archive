@@ -3,6 +3,7 @@ import { mapGetters } from 'vuex';
 import HelloWorld from './components/HelloWorld.vue'
 import LoginDialog from './components/dialogs/LoginDialog.vue'
 import { mapState } from 'vuex';
+import { getS3Host } from './main';
 
 </script>
 <script lang="ts">
@@ -65,8 +66,6 @@ export default {
       <div v-else>
         <a href="#" @click.prevent="$store.dispatch('logout')">Logout</a>
         <span>{{ $store.Username }}</span>
-      </div>
-      <div>
       </div>
     </footer>
   </div>

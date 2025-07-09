@@ -7,6 +7,7 @@ services:
       - "5173:5173"
     environment:
       NODE_ENV: development
+      VITE_S3_ENDPOINT: http://localhost:9000
     volumes:
       - "./web/src:/app/src"
       - "./web/index.html:/app/index.html"
@@ -28,6 +29,7 @@ services:
     volumes:
       - "./pkg:/app/pkg"
       - "./scripts:/app/scripts"
+      - "./assets:/app/assets"
       - "./main.go:/app/main.go"
       - "./aws:/root/.aws"
     #ports:

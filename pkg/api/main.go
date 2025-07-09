@@ -28,8 +28,6 @@ func InitApi(rg *gin.RouterGroup, db *pgxpool.Pool) {
 		if id == nil {
 			ctx.JSON(http.StatusOK, nil)
 		} else {
-			//fmt.Println(id)
-
 			id = id.(string)
 
 			user, err := LookupUser(db, id.(string))

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { mapGetters } from 'vuex'
-import { getDevPrefix } from '../main'
+import { getDevPrefix, getS3Host } from '../main'
 import Paginator from './Paginator.vue'
 import type { Music } from '../types'
 import { ref } from 'vue';
@@ -60,7 +60,7 @@ export default {
     <div class="browse-list" :class="{ 'small': small }">
         <div class="row" v-for="(item, index) in data.Rows" v-if="data != null">
             <div class="cover-area" v-if="showCover">
-                <img :src="'http://s3.rillo.internal:8333' + item.CoverUrl">
+                <img :src="getS3Host() + item.CoverUrl">
             </div>
 
             <div class="name-area">

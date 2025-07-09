@@ -12,6 +12,12 @@ export function getDevPrefix() {
         return "http://localhost:8080"
     } else return "";
 }
+
+export function getS3Host() {
+    if (import.meta.env.VITE_S3_ENDPOINT) {
+        return import.meta.env.VITE_S3_ENDPOINT
+    }
+}
 createApp(App)
     .use(router)
     .use(store)

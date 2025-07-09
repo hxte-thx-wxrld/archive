@@ -8,6 +8,7 @@ import (
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"github.com/htw-archive/pkg/model"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"golang.org/x/crypto/bcrypt"
@@ -17,7 +18,7 @@ type UserLookupResult struct {
 	UserId          string
 	Username        string
 	Admin           bool
-	AssignedArtists []Artist
+	AssignedArtists []model.Artist
 }
 
 type CheckPasswordResponse struct {
@@ -52,7 +53,7 @@ func AdminMiddleware(ctx *gin.Context) {
 	}
 }
 
-func GetAssignedArtists(db *pgxpool.Pool, userid string) ([]Artist, error) {
+func GetAssignedArtists(db *pgxpool.Pool, userid string) ([]model.Artist, error) {
 	rows, err := db.Query(context.Background(), "select i.id as ArtistId, i.name from artists_of_user aou join interpret i on i.id = aou.artist_id where aou.user_id::text = @userId", pgx.NamedArgs{
 		"userId": userid,
 	})
@@ -61,9 +62,9 @@ func GetAssignedArtists(db *pgxpool.Pool, userid string) ([]Artist, error) {
 		return nil, err
 	}
 
-	var a []Artist
+	var a []model.Artist
 	for rows.Next() {
-		var artist Artist
+		var artist model.Artist
 
 		err := rows.Scan(&artist.ArtistId, &artist.Name)
 		if err != nil {

@@ -32,21 +32,6 @@ func TrackApi(rg *gin.RouterGroup, db *pgxpool.Pool) {
 		err = lookup.AllTracks(db, offset_int)
 
 		fmt.Println(lookup)
-		/*var music []MusicRow
-		if offset != "" && conv_err == nil {
-
-			music, err = GetTracksPaginated(db, offset_int)
-			if err != nil {
-				log.Println(err)
-				ctx.JSON(http.StatusInternalServerError, err)
-			}
-		} else {
-			music, err = GetTracks(db)
-			if err != nil {
-				log.Println(err)
-				ctx.JSON(http.StatusInternalServerError, err)
-			}
-		}*/
 
 		if err != nil {
 			log.Println(err)
@@ -55,69 +40,6 @@ func TrackApi(rg *gin.RouterGroup, db *pgxpool.Pool) {
 			ctx.JSON(http.StatusOK, lookup)
 		}
 	})
-
-	// Upload track to database
-	/*ag.POST("/", AuthenticatedMiddleware, func(ctx *gin.Context) {
-		sess := sessions.Default(ctx)
-		userid := sess.Get("userid").(string)
-		admin := sess.Get("admin").(bool)
-
-		fmt.Println("is admin", admin)
-
-		form, err := ctx.MultipartForm()
-		if err != nil {
-			fmt.Println(err)
-			ctx.JSON(http.StatusBadRequest, err)
-			return
-		}
-
-		var req UploadedTrack
-
-		err = ctx.Bind(&req)
-
-		if err != nil {
-			fmt.Println(err)
-			ctx.JSON(http.StatusBadRequest, err)
-			return
-		}
-
-		fmt.Println(req)
-		var tmpaudio multipart.File
-
-		for _, file := range form.File["AudioFile"] {
-
-			//if file.Header.Get("Content-Type") == "audio/x-wav" {
-
-			tmpaudio, err = file.Open()
-			if err != nil {
-				fmt.Println(err)
-				ctx.JSON(http.StatusBadRequest, err)
-				return
-			}
-
-			break
-			//}
-
-		}
-
-		res, err := registerUpload(db, req, tmpaudio, userid, admin)
-		if err != nil {
-			fmt.Println("db", err)
-			ctx.JSON(http.StatusBadRequest, err)
-			return
-		}
-
-		//err := row.Scan()
-
-		//if err != nil {
-		//	fmt.Println(err)
-		//	ctx.JSON(http.StatusInternalServerError, err)
-		//} else {
-
-		ctx.JSON(http.StatusOK, res)
-		//}
-
-	})*/
 
 	ag.PUT("/:id", AuthenticatedMiddleware, func(ctx *gin.Context) {
 		id := ctx.Param("id")

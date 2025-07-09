@@ -35,7 +35,7 @@ async function switchPage(i: number) {
 function applyList() {
     reloadList(page.value).then(e => {
         Rows.value = e.Rows
-        FullLength.value = e.FullLength
+        FullLength.value = e.PageCount
     })
 }
 

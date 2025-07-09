@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"mime/multipart"
 
+	"github.com/htw-archive/pkg/s3store"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -21,8 +22,15 @@ type InboxItem struct {
 }
 
 type PaginatedInboxItems struct {
-	Rows       []InboxItem
-	FullLength int
+	Rows      []InboxItem
+	PageCount int
+	Count     int
+}
+
+func GetInboxCount(db *pgxpool.Pool) (PaginatedInboxItems, error) {
+	c := PaginatedInboxItems{}
+	err := c.getTotalCount(db)
+	return c, err
 }
 
 func (p *PaginatedInboxItems) AllWaitingInboxItems(db *pgxpool.Pool, page int) error {
@@ -36,31 +44,23 @@ func (p *PaginatedInboxItems) AllWaitingInboxItems(db *pgxpool.Pool, page int) e
 		return err
 	}
 
-	c, err := p.getTotalCount(db)
+	err = p.getTotalCount(db)
 	if err != nil {
 		fmt.Println(err)
 		return err
 	}
-	p.FullLength = *c
 
 	return p.fromRow(row)
 }
 
-func (p *PaginatedInboxItems) getTotalCount(db *pgxpool.Pool) (*int, error) {
-	sql := "select count(*)/@limit from uploads"
+func (p *PaginatedInboxItems) getTotalCount(db *pgxpool.Pool) error {
+	sql := "select count(*)/@limit, count(*) from uploads where status='waiting'"
 
 	row := db.QueryRow(context.Background(), sql, pgx.NamedArgs{
 		"limit": 15,
 	})
 
-	var count int
-	err := row.Scan(&count)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return &count, nil
+	return row.Scan(&p.PageCount, &p.Count)
 
 }
 
@@ -78,7 +78,7 @@ func (p *PaginatedInboxItems) fromRow(row pgx.Rows) error {
 }
 
 func (item *InboxItem) FromId(db *pgxpool.Pool, id string) error {
-	row, err := db.Query(context.Background(), "SELECT id, uri, trackname, artistid, createdby, createdat::text, status FROM uploads where status = 'waiting' and id = @id;", pgx.NamedArgs{
+	row, err := db.Query(context.Background(), "SELECT id, uri, trackname, artistid, createdby, createdat::text, status FROM uploads where id = @id;", pgx.NamedArgs{
 		"id": id,
 	})
 
@@ -138,7 +138,7 @@ func (item *InboxItem) RegisterUpload(db *pgxpool.Pool, fileobj multipart.File, 
 		return err
 	}
 
-	o, err := UploadTrackToS3(objId, fileobj)
+	o, err := s3store.UploadTrackToS3(objId, fileobj)
 	if err != nil {
 		fmt.Println(err)
 		return err
