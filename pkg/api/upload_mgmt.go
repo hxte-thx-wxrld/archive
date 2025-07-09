@@ -75,7 +75,12 @@ func FileInboxApi(rg *gin.RouterGroup, db *pgxpool.Pool) {
 
 	ag.GET("/:id/accept", func(ctx *gin.Context) {
 		id := ctx.Param("id")
+		if id == "" {
+			ctx.Status(http.StatusBadRequest)
+			return
+		}
 
 		acceptUpload(db, id)
+		ctx.Status(http.StatusOK)
 	})
 }

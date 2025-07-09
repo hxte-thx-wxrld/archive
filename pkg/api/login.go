@@ -43,6 +43,7 @@ func AuthenticatedMiddleware(ctx *gin.Context) {
 func AdminMiddleware(ctx *gin.Context) {
 	session := sessions.Default(ctx)
 	admin := session.Get("admin").(bool)
+	fmt.Println("Is Admin:", admin)
 	if admin {
 		ctx.Next()
 	} else {

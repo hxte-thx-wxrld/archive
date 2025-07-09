@@ -54,7 +54,7 @@ type TrackEditRequest struct {
 	ArtistId    string
 }
 
-func registerUpload(db *pgxpool.Pool, req UploadedTrack, fileobj multipart.File, userid string) (*UploadedTrackResponse, error) {
+func registerUpload(db *pgxpool.Pool, req UploadedTrack, fileobj multipart.File, userid string, admin bool) (*UploadedTrackResponse, error) {
 	tx, err := db.BeginTx(context.Background(), pgx.TxOptions{})
 
 	if err != nil {
@@ -64,11 +64,20 @@ func registerUpload(db *pgxpool.Pool, req UploadedTrack, fileobj multipart.File,
 
 	defer tx.Rollback(context.Background())
 
-	rows := db.QueryRow(context.Background(), "INSERT INTO uploads (trackname, release_date, artistId, createdby) VALUES (@Title, @ReleaseDate::date, @ArtistId, @CreatedBy) returning id::text", pgx.NamedArgs{
+	var status string
+	if admin {
+		//status = "accepted"
+		status = "waiting"
+	} else {
+		status = "waiting"
+	}
+
+	rows := db.QueryRow(context.Background(), "INSERT INTO uploads (trackname, release_date, artistId, createdby, status) VALUES (@Title, @ReleaseDate::date, @ArtistId, @CreatedBy, @Status) returning id::text", pgx.NamedArgs{
 		"Title":       req.TrackTitle,
 		"ArtistId":    req.ArtistId,
 		"ReleaseDate": req.ReleaseDate,
 		"CreatedBy":   userid,
+		"Status":      status,
 	})
 
 	var objId string
@@ -316,7 +325,7 @@ func TrackApi(rg *gin.RouterGroup, db *pgxpool.Pool) {
 
 		}
 
-		res, err := registerUpload(db, req, tmpaudio, userid)
+		res, err := registerUpload(db, req, tmpaudio, userid, admin)
 		if err != nil {
 			fmt.Println("db", err)
 			ctx.JSON(http.StatusBadRequest, err)

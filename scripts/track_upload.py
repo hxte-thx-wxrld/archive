@@ -2,12 +2,15 @@ import tempfile
 
 conn = database()
 cur = conn.cursor()
-cur.execute("SELECT uri, trackname, release_date, artistid FROM uploads WHERE id=%s", (args.trackId,))
+cur.execute("SELECT uri, trackname, release_date, artistid, status FROM uploads WHERE id=%s", (args.trackId,))
 data = cur.fetchone()
 #conn.close()
 c = s3()
 
 print(args.trackId)
+
+cur.execute("UPDATE public.uploads SET status='analyzing' WHERE id::text = %s", (args.trackId,))
+conn.commit()
 
 with tempfile.NamedTemporaryFile() as tfile:
     #c.download_file()    
@@ -30,11 +33,11 @@ with tempfile.NamedTemporaryFile() as tfile:
     
     c.upload_fileobj(tfile, "tracks", args.trackId + ".wav")
     cur.execute("INSERT INTO music (id, title, artist_id, public_url, release_date) VALUES(%s, %s, %s, %s, %s)", (args.trackId, data[1], data[3], "/tracks/" + args.trackId + ".wav", data[2]))
-    cur.fetchone()
     print("Inserted into music library")
     
-    cur.execute("UPDATE public.uploads SET status='finished' WHERE id::text = %s", (data[0],))
-    cur.fetchone()
+    cur.execute("UPDATE public.uploads SET status='finished' WHERE id::text = %s", (args.trackId,))
+    conn.commit()
     print("Update Status")
+    
 
 print("worker finished")

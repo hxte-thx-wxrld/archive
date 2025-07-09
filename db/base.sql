@@ -127,10 +127,10 @@ CREATE FUNCTION public.notify_daemon_on_track_upload() RETURNS trigger
     AS $$
 	BEGIN
 		
-		perform case when OLD.status = 'waiting'
-		then pg_notify('track_upload', OLD.id::text)
+		perform case when NEW.status = 'accepted' and old.status is distinct from new.status
+		then pg_notify('track_upload', NEW.id::text)
 		END;
-		RETURN OLD;
+		RETURN NEW;
 	END;
 $$;
 

@@ -4,7 +4,6 @@ import (
 	"context"
 	"embed"
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 	"time"
@@ -34,12 +33,16 @@ func runScript(scripts *embed.FS, name string, id string) {
 	cmd := exec.Command("python3", "-c", script, "--", id)
 
 	cmd.Env = os.Environ()
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	cmd.Run()
 
-	out, err := cmd.CombinedOutput()
+	/*out, err := cmd.CombinedOutput()
 	if err != nil {
 		log.Println(err)
 	}
 	fmt.Println(string(out))
+	*/
 }
 
 func daemon(b chan bool) {
