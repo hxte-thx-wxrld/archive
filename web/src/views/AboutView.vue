@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import InboxListMixin from '../components/lists/InboxListMixin.vue';
+import TrackListMixin from '../components/lists/TrackListMixin.vue';
 import DatabaseList from '../components/mixins/DatabaseList.vue';
 
 async function acceptInboxItem(item) {

@@ -10,6 +10,7 @@ import ArtistCreateDialog from '../components/dialogs/ArtistCreateDialog.vue';
 import ReleaseCreateDialog from '../components/dialogs/ReleaseCreateDialog.vue';
 import DatabaseList from '../components/mixins/DatabaseList.vue';
 import DatabaseListItem from '../components/lists/InboxListMixin.vue';
+import TrackListMixin from '../components/lists/TrackListMixin.vue';
 
 const showSearchbar = ref(false)
 </script>
@@ -87,7 +88,11 @@ export default {
             <a class="open-inbox" href="#" data-count="1" @click.prevent="$router.push('/catalog/track-inbox')" v-if="isAdmin">Inbox</a>
         </div>
         <Suspense>
-            <TrackList :small="false" :show-cover="true" @trackSelect="openTrack" />
+
+            
+
+                <TrackList :small="false" :show-cover="true" @trackSelect="openTrack" />
+
             <template #fallback>
                 Loading...
             </template>

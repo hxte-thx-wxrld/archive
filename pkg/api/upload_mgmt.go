@@ -23,7 +23,8 @@ type InboxItem struct {
 }
 
 type PaginatedInboxItems struct {
-	Rows []InboxItem
+	Rows       []InboxItem
+	FullLength int
 }
 
 func acceptUpload(db *pgxpool.Pool, UploadId string) {
@@ -69,7 +70,8 @@ func FileInboxApi(rg *gin.RouterGroup, db *pgxpool.Pool) {
 		}
 
 		ctx.JSON(http.StatusOK, PaginatedInboxItems{
-			Rows: inbox,
+			Rows:       inbox,
+			FullLength: 0,
 		})
 	})
 

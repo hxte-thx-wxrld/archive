@@ -11,7 +11,7 @@ const page = ref<number>(0);
 const props = defineProps<{
     //showCover: boolean,
     apiEndpoint: string,
-    small: boolean,
+
 }>();
 
 const Rows = ref([])
@@ -29,12 +29,13 @@ async function reloadList(page): Promise<PaginatedInboxItems> {
 async function switchPage(i: number) {
     console.log(i)
     page.value = i
-    const j = reloadList(page.value)
+    await reloadList(page.value)
 }
 
 function applyList() {
     reloadList(page.value).then(e => {
         Rows.value = e.Rows
+        FullLength.value = e.FullLength
     })
 }
 
@@ -58,7 +59,7 @@ export default {
 </script>
 
 <template>
-    <div class="browse-list" :class="{ 'small': props.small }">
+    <div class="browse-list">
         <slot></slot>
 
         <!--
