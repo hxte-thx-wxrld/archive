@@ -66,8 +66,7 @@ func registerUpload(db *pgxpool.Pool, req UploadedTrack, fileobj multipart.File,
 
 	var status string
 	if admin {
-		//status = "accepted"
-		status = "waiting"
+		status = "accepted"
 	} else {
 		status = "waiting"
 	}
