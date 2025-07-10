@@ -97,7 +97,7 @@ func FileInboxApi(rg *gin.RouterGroup, db *pgxpool.Pool) {
 		ctx.Status(http.StatusOK)
 	})
 
-	ag.POST("/:id/delete", AdminMiddleware, IdChecker, func(ctx *gin.Context) {
+	ag.DELETE("/:id/delete", AdminMiddleware, IdChecker, func(ctx *gin.Context) {
 		id := ctx.Param("id")
 
 		item := model.InboxItem{

@@ -40,6 +40,8 @@ func (r *ReleasesLookup) AllReleases(db *pgxpool.Pool, offset int) error {
 		return err
 	}
 
+	defer rows.Close()
+
 	err = r.getTotalCount(db)
 	if err != nil {
 		return err
@@ -81,6 +83,14 @@ func (r *Release) FromMultipartForm(db *pgxpool.Pool, form *multipart.Form) {
 		r.RelatedMusic = append(r.RelatedMusic, m)
 	}
 
+}
+
+func (r *Release) Create(db *pgxpool.Pool) error {
+	row := db.QueryRow(context.Background(), "INSERT INTO public.releases (name)VALUES(@name) returning id", pgx.NamedArgs{
+		"name": r.Name,
+	})
+
+	return row.Scan(&r.ReleaseId)
 }
 
 func (r *Release) Edit(db *pgxpool.Pool) error {

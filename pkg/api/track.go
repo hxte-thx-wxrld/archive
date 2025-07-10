@@ -77,4 +77,52 @@ func TrackApi(rg *gin.RouterGroup, db *pgxpool.Pool) {
 
 		ctx.JSON(http.StatusOK, track)
 	})
+
+	ag.DELETE("/:id", IdChecker, func(ctx *gin.Context) {
+		id := ctx.Param("id")
+
+		track := model.Music{
+			TrackId: id,
+		}
+		err := track.FromId(db, id)
+		if err != nil {
+			fmt.Println(err)
+			ctx.JSON(http.StatusBadRequest, err)
+			return
+		}
+		err = track.Delete(db)
+		if err != nil {
+			fmt.Println(err)
+			ctx.JSON(http.StatusBadRequest, err)
+			return
+		}
+
+		ctx.Status(http.StatusOK)
+	})
+
+	ag.GET("/:id/analysis", IdChecker, func(ctx *gin.Context) {
+		id := ctx.Param("id")
+
+		t := ctx.Query("type")
+
+		a := model.Analysis{
+			TrackId: id,
+		}
+		err := a.ForTrackId(db)
+		if err != nil {
+			fmt.Println(err)
+			ctx.JSON(http.StatusInternalServerError, err)
+			return
+		}
+
+		if t == "json" {
+
+			fmt.Println("json export")
+			ctx.Header("Content-Disposition", "attachment; filename="+id+"-analysis.json")
+			ctx.Header("Content-Type", "application/json")
+		}
+
+		ctx.JSON(http.StatusOK, a)
+
+	})
 }

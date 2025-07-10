@@ -7,11 +7,13 @@ import (
 	"io"
 	"log"
 	"mime/multipart"
+	"os"
 	"sort"
 	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
@@ -110,7 +112,7 @@ func SetupS3Store(statics embed.FS) {
 }
 
 func NewS3Config() (*s3.Client, error) {
-	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion("US"))
+	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithBaseEndpoint(os.Getenv("INTERNAL_S3_ENDPOINT")), config.WithRegion("US"), config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(os.Getenv("S3_ROOT_ACCESS_KEY"), os.Getenv("S3_ROOT_SECRET_KEY"), os.Getenv("S3_ROOT_SESSION_TOKEN"))))
 	if err != nil {
 		log.Println(err)
 		return nil, err
@@ -138,6 +140,15 @@ func UploadFileToS3(svc *s3.Client, filename string, bucket_name string, data io
 	})
 }
 
+func DeleteTrackFromArchive(filename string) error {
+	svc, err := NewS3Config()
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	return DeleteFileFromS3(svc, "tracks", filename)
+}
 func DeleteTrackFromInbox(filename string) error {
 	svc, err := NewS3Config()
 	if err != nil {
@@ -147,7 +158,7 @@ func DeleteTrackFromInbox(filename string) error {
 
 	return DeleteFileFromS3(svc, "inbox", filename)
 }
-func DeleteFileFromS3(svc *s3.Client, filename string, bucket_name string) error {
+func DeleteFileFromS3(svc *s3.Client, bucket_name string, filename string) error {
 	o, err := svc.DeleteObject(context.Background(), &s3.DeleteObjectInput{
 		Bucket: aws.String(bucket_name),
 		Key:    aws.String(filename),

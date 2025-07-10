@@ -33,6 +33,9 @@ func runScript(scripts *embed.FS, name string, id string) {
 	cmd := exec.Command("python3", "-c", script, "--", id)
 
 	cmd.Env = os.Environ()
+	cmd.Env = append(cmd.Env, "AWS_ACCESS_KEY_ID="+os.Getenv("S3_ROOT_ACCESS_KEY"))
+	cmd.Env = append(cmd.Env, "AWS_SECRET_ACCESS_KEY="+os.Getenv("S3_ROOT_SECRET_KEY"))
+
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	cmd.Run()

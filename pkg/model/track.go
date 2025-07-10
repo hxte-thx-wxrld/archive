@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/htw-archive/pkg/s3store"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -18,15 +19,48 @@ type Music struct {
 	PublicUrl   *string
 	ReleaseId   *string
 	CoverUrl    *string
-	Length      string
+	Length      *string
 }
 
 type PaginatedMusicLookup struct {
 	Rows       []Music
 	FullLength int
+	Count      int
+}
+
+func (m *PaginatedMusicLookup) GetTracksByArtist(db *pgxpool.Pool, offset int, id string) error {
+	rows, err := db.Query(context.Background(),
+		"select track_id, tracktitle, artist_id, artist, catalog_no, release_date::text, url, release_id, cover_url, length::text from all_tracks where artist_id = @id order by release_date desc LIMIT @limit OFFSET @offset", pgx.NamedArgs{
+			"limit":  PAGINATED_COUNT,
+			"offset": offset * PAGINATED_COUNT,
+			"id":     id,
+		})
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+
+	err = m.getTotalCountForArtist(db, id)
+	if err != nil {
+		return err
+	}
+
+	return m.fromRow(rows)
+}
+
+func (m *PaginatedMusicLookup) getTotalCountForArtist(db *pgxpool.Pool, id string) error {
+	sql := "select count(*)/@limit, count(*) from all_tracks where artist_id = @id"
+
+	row := db.QueryRow(context.Background(), sql, pgx.NamedArgs{
+		"limit": PAGINATED_COUNT,
+		"id":    id,
+	})
+
+	return row.Scan(&m.FullLength, &m.Count)
 }
 
 func (m *PaginatedMusicLookup) AllTracks(db *pgxpool.Pool, offset int) error {
+
 	rows, err := db.Query(context.Background(),
 		"select track_id, tracktitle, artist_id, artist, catalog_no, release_date::text, url, release_id, cover_url, length::text from all_tracks order by release_date desc LIMIT @limit OFFSET @offset", pgx.NamedArgs{
 			"limit":  PAGINATED_COUNT,
@@ -35,6 +69,7 @@ func (m *PaginatedMusicLookup) AllTracks(db *pgxpool.Pool, offset int) error {
 	if err != nil {
 		return err
 	}
+	defer rows.Close()
 
 	err = m.getTotalCount(db)
 	if err != nil {
@@ -45,13 +80,13 @@ func (m *PaginatedMusicLookup) AllTracks(db *pgxpool.Pool, offset int) error {
 }
 
 func (m *PaginatedMusicLookup) getTotalCount(db *pgxpool.Pool) error {
-	sql := "select count(*)/@limit from all_tracks"
+	sql := "select count(*)/@limit, count(*) from all_tracks"
 
 	row := db.QueryRow(context.Background(), sql, pgx.NamedArgs{
 		"limit": PAGINATED_COUNT,
 	})
 
-	return row.Scan(&m.FullLength)
+	return row.Scan(&m.FullLength, &m.Count)
 }
 
 func (m *PaginatedMusicLookup) fromRow(rows pgx.Rows) error {
@@ -93,4 +128,26 @@ func (m *Music) EditTrack(db *pgxpool.Pool) error {
 	})
 
 	return row.Scan()
+}
+
+func (item *Music) Delete(db *pgxpool.Pool) error {
+	tx, err := db.BeginTx(context.Background(), pgx.TxOptions{})
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback(context.Background())
+
+	err = s3store.DeleteTrackFromArchive(item.TrackId + ".wav")
+	if err != nil {
+		return err
+	}
+
+	_, err = tx.Exec(context.Background(), "delete from music where id = @id", pgx.NamedArgs{
+		"id": item.TrackId,
+	})
+	if err != nil {
+		return err
+	}
+
+	return tx.Commit(context.Background())
 }

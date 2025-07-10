@@ -1,5 +1,4 @@
 import type { InjectionKey } from "vue"
-import { getDevPrefix } from "./main"
 import { createStore, Store } from "vuex"
 import type { Artist } from "./types"
 
@@ -34,6 +33,9 @@ export const store = createStore<State>({
             state.Username = null
             state.Admin = false
             state.AssignedArtists = []
+        },
+        setConfig(state, data) {
+            state.s3Endpoint = data.S3Endpoint
         }
     },
     getters: {
@@ -42,11 +44,14 @@ export const store = createStore<State>({
         },
         isAdmin(state) {
             return state.Admin == true
+        },
+        s3Host(state) {
+            return state.s3Endpoint
         }
     },
     actions: {
         async login({ dispatch }, fdata) {
-            const req = await fetch(getDevPrefix() + "/api/login", {
+            const req = await fetch("/api/login", {
                 method: "POST",
                 credentials: 'include',
                 body: JSON.stringify({
@@ -64,7 +69,7 @@ export const store = createStore<State>({
 
         },
         async logout({ commit }) {
-            const req = await fetch(getDevPrefix() + "/api/logout", {
+            const req = await fetch("/api/logout", {
                 method: "POST",
                 credentials: 'include'
             })
@@ -77,7 +82,7 @@ export const store = createStore<State>({
 
             //const json = await req.json();
 
-            const whoami = await fetch(getDevPrefix() + "/api/me", {
+            const whoami = await fetch("/api/me", {
                 method: "GET",
                 credentials: 'include'
             })
@@ -85,5 +90,14 @@ export const store = createStore<State>({
             const data = await whoami.json();
             commit('setUserdata', data)
         },
+
+        async fetchConfig(state) {
+            const req = await fetch("/api/config", {
+                method: "GET"
+            })
+
+            const data = await req.json()
+            state.commit("setConfig", data)
+        }
     }
 })

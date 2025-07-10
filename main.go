@@ -3,8 +3,11 @@ package main
 import (
 	"embed"
 	"fmt"
+	"log"
+	"os"
 
 	htwarchive "github.com/htw-archive/pkg"
+	"github.com/htw-archive/pkg/api"
 	"github.com/htw-archive/pkg/s3store"
 )
 
@@ -26,6 +29,10 @@ func main() {
 	//config := htwarchive.DefaultServerConfig()
 	s3store.SetupS3Store(s3assets)
 	conn := htwarchive.InitDb()
+	err := api.UpdateAdminAccess(conn, os.Getenv("ROOT_PASSWORD"))
+	if err != nil {
+		log.Fatal(err)
+	}
 	htwarchive.Serve(conn, index_html, f)
 	fmt.Println("post serve")
 }

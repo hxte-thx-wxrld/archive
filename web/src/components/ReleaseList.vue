@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import { getDevPrefix, getS3Host } from '../main'
 import MockTracks from '../mock/all_tracks.json'
 import type { Release } from '../types';
 import { ref } from 'vue';
 
 async function reloadList(page) {
-    const req = await fetch(getDevPrefix() + "/api/release?offset=0")
+    const req = await fetch("/api/release?offset=0")
     return await req.json()
 }
 
@@ -32,21 +31,21 @@ export default {
     <div class="browse-list">
         <div class="row" v-for="(item, index) in data.Rows" v-if="data != null">
             <div class="cover-area">
-                <img :src="getS3Host() + item.CoverUrl">
+                <img :src="$store.getters.s3Host + item.CoverUrl">
             </div>
 
             <div class="name-area">
-                    <a class="open-track" href="#" @click="$emit('releaseSelect', item)">
+                <a class="open-track" href="#" @click="$emit('releaseSelect', item)">
 
-                        <div class="tracktitle">
-                            <strong>
-                                {{ item.Name }}
-                            </strong>
-                        </div>
-                        <div class="artist">{{ item.Artist }}</div>
-                        <div v-if="item.CatalogId" class="release-code">{{ item.CatalogId }}</div>
-                        <small class="catalogId" v-else>No catalog release</small>
-                    </a>
+                    <div class="tracktitle">
+                        <strong>
+                            {{ item.Name }}
+                        </strong>
+                    </div>
+                    <div class="artist">{{ item.Artist }}</div>
+                    <div v-if="item.CatalogId" class="release-code">{{ item.CatalogId }}</div>
+                    <small class="catalogId" v-else>No catalog release</small>
+                </a>
 
             </div>
         </div>

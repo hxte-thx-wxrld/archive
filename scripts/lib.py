@@ -23,4 +23,4 @@ def database():
     return psycopg2.connect(dn)
 
 def s3():
-    return boto3.client("s3")
+    return boto3.client("s3", endpoint_url=os.environ["INTERNAL_S3_ENDPOINT"])

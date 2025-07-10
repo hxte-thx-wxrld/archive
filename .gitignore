@@ -3,6 +3,7 @@ dist/
 dump-*.sql
 .env
 appdata/
+appdata.prod/
 daemon/database.ini
 aws
 .venv

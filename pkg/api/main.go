@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
@@ -16,10 +17,14 @@ type LoginRequest struct {
 	Password string `json:"password"`
 }
 
+type ClientConfig struct {
+	S3Endpoint string
+}
+
 // Checks, if the request has given an id
 func IdChecker(ctx *gin.Context) {
 	objId := ctx.Param("id")
-	if objId == "" {
+	if objId == "" || objId == "undefined" || objId == "null" {
 		ctx.JSON(http.StatusBadRequest, errors.New("no id given"))
 	} else {
 		ctx.Next()
@@ -111,5 +116,13 @@ func InitApi(rg *gin.RouterGroup, db *pgxpool.Pool) {
 		}
 
 		ctx.Status(http.StatusOK)
+	})
+
+	rg.GET("/config", func(ctx *gin.Context) {
+		c := ClientConfig{
+			S3Endpoint: os.Getenv("EXTERNAL_S3_ENDPOINT"),
+		}
+
+		ctx.JSON(http.StatusOK, c)
 	})
 }

@@ -1,20 +1,4 @@
 services:
-  #frontend:
-  #  build:
-  #    context: .
-  #    dockerfile: Dockerfile.client
-  #  ports:
-  #    - "5173:5173"
-  #  environment:
-  #    NODE_ENV: development
-  #  volumes:
-  #    - "./web/src:/app/src"
-  #    - "./web/index.html:/app/index.html"
-  #    - "./web/vite.config.ts:/app/vite.config.ts"
-  #  user: "0:0"
-  #  depends_on:
-  #    - backend
-
   backend:
     restart: always
     depends_on:
@@ -24,29 +8,41 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    #ports:
-    #  - 8080:8080
-    environment:
-      #PG_URL: postgres://pguser:pgpassword@db:5432/pguser?search_path=public
-      #S3_ENDPOINT: 
-      #GIN_MODE: release
     volumes:
-      - "./.env:/.env"
-      - ".:/app"
-  weed:
-    image: chrislusf/seaweedfs # use a remote image
-    restart: always
+      - "./aws:/root/.aws"
     ports:
-      - 8333:8333
-    command: "server -dir=/data -s3 -idleTimeout=30"
-    healthcheck:
-      test: netstat -lntup weed | grep :8333
-      interval: 1s
-    volumes:
+      - 8080:8080
+    environment:
+      EXTERNAL_S3_ENDPOINT: http://127.0.0.1:9000
+      INTERNAL_S3_ENDPOINT: http://minio:9000
+      ROOT_PASSWORD: "rootpassword"
+      S3_ROOT_ACCESS_KEY: admin
+      S3_ROOT_SECRET_KEY: changeme
+      PG_HOST: db
+      PG_PORT: 5432
+      PG_DATABASE: pguser
+      PG_USER: pguser
+      PG_PASSWORD: pgpassword
+      PG_SCHEMA: public
+      WORKER_PG_HOST: db
+      WORKER_PG_PORT: 5432
+      WORKER_PG_DATABASE: pguser
+      WORKER_PG_USER: pguser
+      WORKER_PG_PASSWORD: pgpassword
+      WORKER_PG_SCHEMA: public
+
+  #weed:
+  #  image: chrislusf/seaweedfs # use a remote image
+  #  restart: always
+  #  ports:
+  #    - 8333:8333
+  #  command: "-v=2 server -s3 -dir=/data -idleTimeout=0 -s3.config=/etc/seaweedfs/config.json"
+
+  #  volumes:
       #- "/mnt/hdd/seaweed:/data"
-      - "./appdata/seaweed:/data"
-      - "./s3.json:/etc/seaweedfs/config.json"
-#      - "./filer.toml:/etc/seaweedfs/filer.toml"
+  #    - "./appdata/seaweed:/data"
+  #    - "./s3/config.json:/etc/seaweedfs/config.json"
+  #    - "./s3/filer.toml:/etc/seaweedfs/filer.toml"
 
 # Use postgres/example user/password credentials
   db:
@@ -60,7 +56,7 @@ services:
       #- "./db/base.sql:/docker-entrypoint-initdb.d/0-base.sql"
       - "./db/base.sql:/docker-entrypoint-initdb.d/0-base.sql"
       #- "./db/data.sql:/docker-entrypoint-initdb.d/1-data.sql"
-      - ./appdata/postgres:/var/lib/postgresql/data
+      - ./appdata.prod/postgres:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     healthcheck:
@@ -75,27 +71,44 @@ services:
       POSTGRES_PASSWORD: pgpassword
       POSTGRES_USER: pguser
 
-  daemon:
-    build:
-      context: .
-      dockerfile: Dockerfile.daemon
-    environment:
-      #CRON_SAMPLE: '* * * * * echo 1 minute cron'
-      CRON_ANOTHER_SAMPLE: '0 2 * * * python3 /app/sync_s3.py'
-    depends_on:
-      db:
-        condition: service_healthy
-        restart: true
+  #daemon:
+  #  build:
+  #    context: .
+  #    dockerfile: Dockerfile.daemon
+  #  environment:
+  #    #CRON_SAMPLE: '* * * * * echo 1 minute cron'
+  #    CRON_ANOTHER_SAMPLE: '0 2 * * * python3 /app/sync_s3.py'
+  #  depends_on:
+  #    db:
+  #      condition: service_healthy
+  #      restart: true
 
-  web:
-    image: nginx
-    restart: always
-    volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf
-    ports:
-      - "8080:80"
+  #web:
+  #  image: nginx
+  #  volumes:
+  #    - ./nginx.conf:/etc/nginx/conf.d/default.conf
+  #  ports:
+  #    - "8080:80"
+  #  environment:
+  #    - NGINX_HOST=foobar.com
+  #    - NGINX_PORT=80
+  #  depends_on:
+  #    - backend
+
+  minio:
+    image: quay.io/minio/minio
     environment:
-      - NGINX_HOST=foobar.com
-      - NGINX_PORT=80
-    depends_on:
-      - backend
+      - MINIO_ROOT_USER=root
+      - MINIO_ROOT_PASSWORD=password
+    volumes:
+      - ./appdata.prod/minio:/data
+    ports:
+      - 9000:9000
+      - 9001:9001
+    command: server --console-address :9001 /data --console-address :9001
+# MINIO_VOLUMES sets the storage volume or path to use for the MinIO server.
+
+
+# MINIO_OPTS sets any additional commandline options to pass to the MinIO server.
+# For example, `--console-address :9001` sets the MinIO Console listen port
+

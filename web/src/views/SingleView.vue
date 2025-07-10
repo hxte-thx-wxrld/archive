@@ -2,9 +2,11 @@
 import TrackShowcase from "../components/TrackShowcase.vue";
 import ReleaseShowcase from "../components/ReleaseShowcase.vue";
 import ArtistShowcase from "../components/ArtistShowcase.vue";
-import { ref } from "vue";
+import { onErrorCaptured, ref } from "vue";
 
 const editmode = ref(false);
+const showError = ref(false)
+
 </script>
 <script lang="ts">
 
@@ -14,6 +16,7 @@ export default {
             if (!this.$route.params.mode) {
                 return "tracks";
             } else return this.$route.params.mode;
+
         },
         objectId() {
             return this.$route.params.id as string

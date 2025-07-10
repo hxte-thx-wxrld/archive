@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { mapGetters } from 'vuex'
-import { getDevPrefix } from '../../main'
 import CreateTrackDialog from '../dialogs/TrackUploadDialog.vue'
 
 import { inject, ref } from 'vue';

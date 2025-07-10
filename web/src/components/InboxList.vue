@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { getDevPrefix } from '../main';
+import { computed, ref } from 'vue';
 import type { PaginatedInboxItems } from '../types';
+import Paginator from './Paginator.vue';
 
 
 async function reloadList(page): Promise<PaginatedInboxItems> {
@@ -35,10 +35,21 @@ async function deleteItem(id: string) {
 const page = ref<number>(0);
 const data = ref(await reloadList(page.value))
 console.log(data)
+
+function switchPage(i: number) {
+    console.log(i)
+    page.value = i
+    reloadList(page.value).then(d => {
+        data.value = d
+    })
+}
+
+const hasData = computed(() => data.value.Rows.length > 0)
 </script>
 
 
 <template>
+    
     <ul>
         <li v-for="d in data.Rows">
             <div>{{ d.Trackname }}</div>
@@ -47,7 +58,10 @@ console.log(data)
                 <a href="#" @click.prevent="deleteItem(d.UploadId)">Delete</a>
             </div>
         </li>
+
+        <p v-if="!hasData">Your Inbox is Empty</p>
     </ul>
+    <Paginator :page="page" :pagecount="data.PageCount" @switch-page="switchPage"></Paginator>
 </template>
 
 <style scoped>

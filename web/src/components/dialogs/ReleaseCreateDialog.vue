@@ -10,8 +10,9 @@ export default {
     methods: {
         async create(event: SubmitEvent) {
             const body = new FormData(event.target as HTMLFormElement)
-            const req = await fetch("/api/artist", {
+            const req = await fetch("/api/release", {
                 method: "POST",
+                credentials: "include",
                 body: JSON.stringify({
                     "Name": body.get("name")
                 })

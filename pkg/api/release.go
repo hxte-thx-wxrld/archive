@@ -52,7 +52,7 @@ func ReleaseApi(rg *gin.RouterGroup, db *pgxpool.Pool) {
 		ctx.JSON(http.StatusOK, r)
 	})
 
-	ag.PUT("/:id", IdChecker, func(ctx *gin.Context) {
+	ag.PUT("/:id", AdminMiddleware, IdChecker, func(ctx *gin.Context) {
 		id := ctx.Param("id")
 
 		var r model.Release
@@ -71,5 +71,29 @@ func ReleaseApi(rg *gin.RouterGroup, db *pgxpool.Pool) {
 		}
 
 		fmt.Println(r)
+	})
+
+	ag.POST("/", AdminMiddleware, func(ctx *gin.Context) {
+		//session := sessions.Default(ctx)
+		var req model.Release
+
+		if err := ctx.BindJSON(&req); err != nil {
+			fmt.Println(err)
+			ctx.JSON(http.StatusBadRequest, err)
+			return
+		}
+
+		//id := session.Get("userid").(string)
+
+		err := req.Create(db)
+		if err != nil {
+			fmt.Println(err)
+			ctx.JSON(http.StatusBadRequest, err)
+			return
+		}
+
+		fmt.Println("new id: ", req.ReleaseId)
+
+		ctx.Status(http.StatusOK)
 	})
 }

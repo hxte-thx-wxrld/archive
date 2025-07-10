@@ -14,6 +14,8 @@ func main() {
 
 	OutputStruct(model.InboxItem{})
 	OutputStruct(model.PaginatedInboxItems{})
+	OutputStruct(model.PaginatedMusicLookup{})
+	OutputStruct(model.Analysis{})
 }
 
 func OutputStruct(s interface{}) {

@@ -53,6 +53,30 @@ func AdminMiddleware(ctx *gin.Context) {
 	}
 }
 
+func UpdateAdminAccess(db *pgxpool.Pool, password string) error {
+	/*INSERT INTO inventory (id, name, price, quantity) VALUES (1, 'A', 16.99, 120)
+	ON CONFLICT(id)
+	DO UPDATE SET
+	  price = EXCLUDED.price,
+	  quantity = EXCLUDED.quantity;
+		_, err := db.Exec(context.Background(), "")*/
+
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+
+	if err != nil {
+		return err
+	}
+
+	_, err = db.Exec(context.Background(), "insert into users (username, password_hash, admin) values ('admin', @password, true) on conflict(username) do update set password_hash=@password", pgx.NamedArgs{
+		"password": bytes,
+	})
+	if err != nil {
+		log.Println(err)
+	}
+
+	return err
+}
+
 func GetAssignedArtists(db *pgxpool.Pool, userid string) ([]model.Artist, error) {
 	rows, err := db.Query(context.Background(), "select i.id as ArtistId, i.name from artists_of_user aou join interpret i on i.id = aou.artist_id where aou.user_id::text = @userId", pgx.NamedArgs{
 		"userId": userid,

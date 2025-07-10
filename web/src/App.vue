@@ -3,12 +3,12 @@ import { mapGetters } from 'vuex';
 import HelloWorld from './components/HelloWorld.vue'
 import LoginDialog from './components/dialogs/LoginDialog.vue'
 import { mapState } from 'vuex';
-import { getS3Host } from './main';
 
 </script>
 <script lang="ts">
 export default {
   mounted() {
+    this.$store.dispatch("fetchConfig")
     this.$store.dispatch("fetchSelfUser")
   },
   methods: {
@@ -129,7 +129,7 @@ footer {
 }
 
 @font-face {
-  font-family: "Bytesized-Regular";
+  font-family: "Bytesized";
   src: url("./assets/fonts/Bytesized-Regular.ttf")
 }
 

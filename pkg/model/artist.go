@@ -34,6 +34,8 @@ func (a *PaginatedArtistLookup) AllArtists(db *pgxpool.Pool, offset int) error {
 
 	a.getTotalCount(db)
 
+	defer rows.Close()
+
 	return a.fromRow(rows)
 }
 func (a *PaginatedArtistLookup) fromRow(rows pgx.Rows) error {

@@ -11,7 +11,7 @@ import (
 
 func InitDb() *pgxpool.Pool {
 
-	urlExample := os.Getenv("PG_URL")
+	urlExample := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?search_path=%s", os.Getenv("PG_USER"), os.Getenv("PG_PASSWORD"), os.Getenv("PG_HOST"), os.Getenv("PG_PORT"), os.Getenv("PG_DATABASE"), os.Getenv("PG_SCHEMA"))
 
 	log.Println(urlExample)
 

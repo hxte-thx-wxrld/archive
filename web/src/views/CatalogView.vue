@@ -76,12 +76,16 @@ function openInbox() {
                 to="/catalog/releases">Releases</RouterLink>
             <RouterLink class="icon artists" :class="getSubmode() == 'artists' ? 'active' : ''" to="/catalog/artists">
                 Artists</RouterLink>
-            <a href="#" @click.prevent="showSearchbar = !showSearchbar">{{ showSearchbar ? "-" : "+" }}</a>
+            <!--
+                <a href="#" @click.prevent="showSearchbar = !showSearchbar">{{ showSearchbar ? "-" : "+" }}</a>
+                -->
         </nav>
-        <div class="tools" :class="showSearchbar ? '' : 'hide'">
-            <input class="search" type="text">
-            <input class="go" type="submit">
-        </div>
+        <!--
+            <div class="tools" :class="showSearchbar ? '' : 'hide'">
+                <input class="search" type="text">
+                <input class="go" type="submit">
+            </div>
+            -->
     </div>
 
     <div v-if="getSubmode() == 'tracks'">
@@ -102,8 +106,11 @@ function openInbox() {
 
     </div>
     <div v-if="getSubmode() == 'track-inbox'">
-        <h1>Inbox</h1>
-        <RouterLink class="icon tracks" to="/catalog/tracks" v-if="isAdmin">Go back</RouterLink>
+        <div class="inbox-header">
+            <span class="title">Inbox</span>
+            <RouterLink class="icon tracks" to="/catalog/tracks" v-if="isAdmin">Go back</RouterLink>
+        </div>
+
         <Suspense>
             <!--
             <DatabaseList api-endpoint="/api/inbox/" :small="true">
@@ -155,6 +162,15 @@ function openInbox() {
 </template>
 
 <style scoped>
+.inbox-header {
+    display: flex;
+    justify-content: space-between;
+}
+
+.inbox-header .title {
+    font-size: 2em;
+}
+
 .catalog-toolbar {
     display: flex;
     padding: 1em 0;
@@ -213,7 +229,7 @@ nav {
 nav.mode {
     padding: 1em 0;
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 32px;
+    grid-template-columns: 1fr 1fr 1fr;
 }
 
 nav.mode a {

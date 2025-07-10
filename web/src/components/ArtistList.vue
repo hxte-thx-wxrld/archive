@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { mapGetters } from 'vuex'
-import { getDevPrefix, getS3Host } from '../main'
 import CreateArtistDialog from './dialogs/ArtistCreateDialog.vue'
 import { ref } from 'vue';
 import type { Artist, PaginatedArtistLookup } from '../types'
@@ -33,7 +32,7 @@ export default {
     <div class="browse-list">
         <div class="row" v-for="(item, index) in data.Rows">
             <div class="cover-area">
-                <img :src="getS3Host() + item.ArtistPicture">
+                <img :src="$store.getters.s3Host + item.ArtistPicture">
             </div>
 
             <div class="name-area">

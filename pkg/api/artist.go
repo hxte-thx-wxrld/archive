@@ -1,7 +1,6 @@
 package api
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -64,12 +63,8 @@ func ArtistApi(rg *gin.RouterGroup, db *pgxpool.Pool) {
 		ctx.Status(http.StatusOK)
 	})
 
-	ag.GET("/:id", func(ctx *gin.Context) {
+	ag.GET("/:id", IdChecker, func(ctx *gin.Context) {
 		id := ctx.Param("id")
-		if id == "" {
-			ctx.JSON(http.StatusBadRequest, errors.New("invalid artist id"))
-			return
-		}
 
 		a := model.Artist{
 			ArtistId: &id,
@@ -84,5 +79,27 @@ func ArtistApi(rg *gin.RouterGroup, db *pgxpool.Pool) {
 		}
 
 		ctx.JSON(http.StatusOK, a)
+	})
+
+	ag.GET("/:id/tracks", IdChecker, func(ctx *gin.Context) {
+		id := ctx.Param("id")
+		offset := ctx.Query("offset")
+
+		offset_int, err := strconv.Atoi(offset)
+		if err != nil {
+			log.Println(err)
+			ctx.JSON(http.StatusInternalServerError, err)
+			return
+		}
+
+		lookup := model.PaginatedMusicLookup{}
+		err = lookup.GetTracksByArtist(db, offset_int, id)
+		if err != nil {
+			log.Println(err)
+			ctx.JSON(http.StatusInternalServerError, err)
+			return
+		}
+
+		ctx.JSON(http.StatusOK, lookup)
 	})
 }

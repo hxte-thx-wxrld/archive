@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { mapGetters } from 'vuex';
-import { getDevPrefix, getS3Host } from '../main'
 import Showcase from './Showcase.vue';
 import EditableText from './EditableText.vue';
 
@@ -14,7 +13,7 @@ function openTrackSelectModal(event: MouseEvent) {
 }
 
 async function fetchData(releaseId): Promise<Release> {
-    const req = await fetch(getDevPrefix() + "/api/release/" + releaseId)
+    const req = await fetch("/api/release/" + releaseId)
     return req.json()
 }
 
@@ -64,7 +63,7 @@ console.log(data.value)
     <form @submit.prevent="save">
     <Showcase>
         <template #left>
-            <img class="cover" :src="getS3Host() + data.CoverUrl">
+            <img class="cover" :src="$store.getters.s3Host + data.CoverUrl">
             <div class="barcode">
                 <vue-barcode :value="data.CatalogId" :options="{ displayValue: true }" tag="svg"></vue-barcode>
             </div>

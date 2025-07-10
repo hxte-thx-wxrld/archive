@@ -27,6 +27,7 @@ ALTER TABLE IF EXISTS ONLY public.artists_of_user DROP CONSTRAINT IF EXISTS arti
 ALTER TABLE IF EXISTS ONLY public.analysis DROP CONSTRAINT IF EXISTS analysis_music_fk;
 DROP TRIGGER IF EXISTS upload_track_trigger ON public.uploads;
 DROP TRIGGER IF EXISTS trigger_set_catalog_id ON public.releases;
+DROP INDEX IF EXISTS public.users_username_idx;
 DROP INDEX IF EXISTS public.uploads_id_idx;
 DROP INDEX IF EXISTS public.music_links_id_idx;
 DROP INDEX IF EXISTS public.music_filepath_idx;
@@ -51,13 +52,13 @@ DROP SEQUENCE IF EXISTS public.music_links_id_seq;
 DROP TABLE IF EXISTS public.music_links;
 DROP SEQUENCE IF EXISTS public.music_in_releases_id_seq;
 DROP TABLE IF EXISTS public.artists_of_user;
-DROP TABLE IF EXISTS public.analysis;
 DROP VIEW IF EXISTS public.all_tracks;
 DROP VIEW IF EXISTS public.published;
 DROP TABLE IF EXISTS public.releases;
 DROP TABLE IF EXISTS public.music_in_releases;
 DROP TABLE IF EXISTS public.music;
 DROP TABLE IF EXISTS public.interpret;
+DROP TABLE IF EXISTS public.analysis;
 DROP FUNCTION IF EXISTS public.set_catalog_id();
 DROP FUNCTION IF EXISTS public.notify_daemon_on_track_upload();
 DROP FUNCTION IF EXISTS public.create_catalog_id(id uuid);
@@ -157,6 +158,22 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
+-- Name: analysis; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.analysis (
+    trackid uuid NOT NULL,
+    tempo double precision DEFAULT 0.0,
+    zcr double precision,
+    rms real,
+    centroid double precision,
+    rolloff double precision,
+    flatness real,
+    duration integer DEFAULT 0 NOT NULL
+);
+
+
+--
 -- Name: interpret; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -164,7 +181,8 @@ CREATE TABLE public.interpret (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
     name character varying(255) NOT NULL,
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
-    artist_picture text DEFAULT 'default.jpg'::text NOT NULL
+    artist_picture text DEFAULT '/artists/default.jpg'::text NOT NULL,
+    description text DEFAULT 'No description given'::text NOT NULL
 );
 
 
@@ -193,7 +211,7 @@ CREATE TABLE public.music (
 CREATE TABLE public.music_in_releases (
     music_id uuid,
     id integer NOT NULL,
-    "order" integer,
+    "position" integer,
     release_id uuid
 );
 
@@ -224,7 +242,7 @@ CREATE VIEW public.published AS
     i.name AS tracktitle,
     r.name AS release_name,
     r.catalog_id AS catalog_no,
-    mr."order" AS track_no,
+    mr."position" AS track_no,
     r.isrc AS isrc_no,
     r.release_date,
     r.cover_image AS cover_url_local,
@@ -234,7 +252,7 @@ CREATE VIEW public.published AS
      JOIN public.music m ON ((mr.music_id = m.id)))
      JOIN public.interpret i ON ((i.id = m.artist_id)))
      JOIN public.releases r ON ((mr.release_id = r.id)))
-  ORDER BY r.id, mr."order";
+  ORDER BY r.id, mr."position";
 
 
 --
@@ -254,25 +272,11 @@ CREATE VIEW public.all_tracks AS
             WHEN (p.release_id IS NULL) THEN m.cover_url
             ELSE p.cover_url
         END AS cover_url,
-    ((m.length)::double precision * '00:00:01'::interval) AS length
-   FROM ((public.music m
+    ((a.duration)::double precision * '00:00:01'::interval) AS length
+   FROM (((public.music m
      JOIN public.interpret i ON ((i.id = m.artist_id)))
-     LEFT JOIN public.published p ON ((p.track_id = m.id)));
-
-
---
--- Name: analysis; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.analysis (
-    trackid uuid NOT NULL,
-    tempo double precision DEFAULT 0.0,
-    zcr double precision,
-    rms real,
-    centroid double precision,
-    rolloff double precision,
-    flatness real
-);
+     LEFT JOIN public.published p ON ((p.track_id = m.id)))
+     LEFT JOIN public.analysis a ON ((a.trackid = m.id)));
 
 
 --
@@ -427,7 +431,7 @@ ALTER TABLE ONLY public.music_in_releases
 --
 
 ALTER TABLE ONLY public.music_in_releases
-    ADD CONSTRAINT music_in_releases_unique UNIQUE ("order", release_id);
+    ADD CONSTRAINT music_in_releases_unique UNIQUE ("position", release_id);
 
 
 --
@@ -507,6 +511,13 @@ CREATE UNIQUE INDEX uploads_id_idx ON public.uploads USING btree (id);
 
 
 --
+-- Name: users_username_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX users_username_idx ON public.users USING btree (username);
+
+
+--
 -- Name: releases trigger_set_catalog_id; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -525,7 +536,7 @@ CREATE TRIGGER upload_track_trigger AFTER INSERT OR UPDATE ON public.uploads FOR
 --
 
 ALTER TABLE ONLY public.analysis
-    ADD CONSTRAINT analysis_music_fk FOREIGN KEY (trackid) REFERENCES public.music(id);
+    ADD CONSTRAINT analysis_music_fk FOREIGN KEY (trackid) REFERENCES public.music(id) ON DELETE CASCADE;
 
 
 --
@@ -549,7 +560,7 @@ ALTER TABLE ONLY public.artists_of_user
 --
 
 ALTER TABLE ONLY public.music
-    ADD CONSTRAINT music_artists_fk FOREIGN KEY (artist_id) REFERENCES public.interpret(id);
+    ADD CONSTRAINT music_artists_fk FOREIGN KEY (artist_id) REFERENCES public.interpret(id) ON DELETE CASCADE;
 
 
 --
@@ -557,7 +568,7 @@ ALTER TABLE ONLY public.music
 --
 
 ALTER TABLE ONLY public.music_in_releases
-    ADD CONSTRAINT music_in_releases_music_fk FOREIGN KEY (music_id) REFERENCES public.music(id);
+    ADD CONSTRAINT music_in_releases_music_fk FOREIGN KEY (music_id) REFERENCES public.music(id) ON DELETE CASCADE;
 
 
 --
@@ -565,7 +576,7 @@ ALTER TABLE ONLY public.music_in_releases
 --
 
 ALTER TABLE ONLY public.music_in_releases
-    ADD CONSTRAINT music_in_releases_releases_fk FOREIGN KEY (release_id) REFERENCES public.releases(id);
+    ADD CONSTRAINT music_in_releases_releases_fk FOREIGN KEY (release_id) REFERENCES public.releases(id) ON DELETE CASCADE;
 
 
 --

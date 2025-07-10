@@ -2,7 +2,6 @@
 </script>
 
 <script lang="ts">
-import { getDevPrefix } from '../../main';
 
 export default {
     data() {
@@ -20,27 +19,6 @@ export default {
             }).catch((err) => {
                 this.err = "login unsuccessful"
             })
-
-            /*const req = await fetch(getDevPrefix() + "/api/login", {
-                method: "POST",
-                credentials: 'include',
-                body: JSON.stringify({
-                    username: data.get("username"),
-                    password: data.get("password"),
-                })
-            })*/
-
-            /*if (req.ok) {
-                console.log(req.ok)
-                //const json = await req.json();
-
-                const whoami = await fetch(getDevPrefix() + "/api/me", {
-                    method: "GET",
-                    credentials: 'same-origin'
-                })
-
-                console.log(await whoami.json());
-            }*/
         }
     }
 }

@@ -65,6 +65,8 @@ func (p *PaginatedInboxItems) getTotalCount(db *pgxpool.Pool) error {
 }
 
 func (p *PaginatedInboxItems) fromRow(row pgx.Rows) error {
+	//defer row.Close()
+	p.Rows = []InboxItem{}
 	for row.Next() {
 		item := InboxItem{}
 		if err := item.fromRow(row); err != nil {
