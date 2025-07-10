@@ -5,16 +5,41 @@ import Showcase from './Showcase.vue';
 import EditableText from './EditableText.vue';
 
 import AssignTracksReleaseDialog from './dialogs/AssignTracksReleaseDialog.vue';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import type { Music, Release } from '../types';
+import { useStore } from 'vuex';
 
-function addTrackToRelease(event: MouseEvent) {
+function openTrackSelectModal(event: MouseEvent) {
     assigndialog.value.showModal()
 }
 
 async function fetchData(releaseId): Promise<Release> {
     const req = await fetch(getDevPrefix() + "/api/release/" + releaseId)
     return req.json()
+}
+
+function applySelection(tracks: Music[]) {
+    //temporary.value.push(...tracks)
+    for (const t of tracks) {
+
+        data.value.RelatedMusic.push({
+            ArtistName: t.Artist,
+            Name: t.Tracktitle,
+            Position: 999, //irrelevant
+            TrackId: t.TrackId
+        })
+    }
+}
+
+async function save(submitEvent: SubmitEvent) {
+    const fdata = new FormData(submitEvent.target as HTMLFormElement)
+    //console.log(Object.fromEntries(fdata))
+
+    const req = await fetch("/api/release/" + data.value.ReleaseId, {
+        credentials: "include",
+        method: "PUT",
+        body: fdata
+    })
 }
 
 const props = defineProps({
@@ -24,22 +49,19 @@ const props = defineProps({
 const edit = ref(false);
 const assigndialog = ref<HTMLDialogElement>()
 const data = ref<Release>(await fetchData(props.releaseId));
+const temporary = ref<Music[]>([])
+
+const store = useStore();
+const isLoggedIn = computed(() => store.getters.isLoggedIn);
 
 console.log(data.value)
 
 </script>
 
-<script lang="ts">
-export default {
-    computed: {
-        ...mapGetters(["isLoggedIn"])
-    },
-    methods: {
-    }
-}
-</script>
+
 
 <template>
+    <form @submit.prevent="save">
     <Showcase>
         <template #left>
             <img class="cover" :src="getS3Host() + data.CoverUrl">
@@ -49,55 +71,72 @@ export default {
         </template>
 
         <template #default>
-            <h1 class="title">
-                <EditableText :reverse-style="false" :edit="edit" :value="data.Name" type="text" name="Name">
+
+                <h1 class="title">
+                    <EditableText :reverse-style="false" :edit="edit" :value="data.Name" type="text" name="Name">
+                    </EditableText>
+                </h1>
+                <strong>Release Date:</strong>
+                <EditableText :reverse-style="false" :edit="edit" :value="data.ReleaseDate" type="date" name="ReleaseDate">
                 </EditableText>
-            </h1>
-            <strong>Release Date:</strong>
-            <EditableText :reverse-style="false" :edit="edit" :value="data.ReleaseDate" type="date" name="ReleaseDate">
-            </EditableText>
-            <strong>Release-Code:</strong><span class="release-code">{{ data.CatalogId }}</span>
-
-            <strong>ISRC-Code:</strong>
-            <EditableText :reverse-style="false" :edit="edit" :value="data.Isrc ?? '-'" type="text" name="Isrc">
-            </EditableText>
-
-            <div class="tracklist">
-                <h2>Track List</h2>
-                <ol class="tracklist">
-                    <li v-for="(music, index) in data.RelatedMusic">
-                        <a :href="'/catalog/tracks/' + music.TrackId">
-                            <div>
-                                <p>
-                                    <strong>
-                                        {{ music.Name }}
-                                    </strong>
-                                </p>
-                            </div>
-                            <div>
-                                <p>
-                                    {{ music.ArtistName }}
-                                </p>
-                            </div>
-                        </a>
-                    </li>
-                    <a href="#" @click.prevent="addTrackToRelease" v-if="isLoggedIn && edit" class="add">
-                        Add Track to Release
-                    </a>
-                </ol>
+                <strong>Release-Code:</strong><span class="release-code">{{ data.CatalogId }}</span>
                 
-            </div>
-
-            <div class="actionbuttons">
-
-                <button type="button" @click.prevent="edit = !edit" v-if="isLoggedIn">{{ edit ? "Cancel" : "Edit"
+                <strong>ISRC-Code:</strong>
+                <EditableText :reverse-style="false" :edit="edit" :value="data.Isrc ?? '-'" type="text" name="Isrc">
+                </EditableText>
+                
+                <div class="tracklist">
+                    <h2>Track List</h2>
+                    <ol class="tracklist">
+                        <li v-for="(music, index) in data.RelatedMusic" >
+                            <a :href="'/catalog/tracks/' + music.TrackId" v-if="!edit">
+                                <div>
+                                    <p>
+                                        <strong>
+                                            {{ music.Name }}
+                                        </strong>
+                                    </p>
+                                </div>
+                                <div>
+                                    <p>
+                                        {{ music.ArtistName }}
+                                    </p>
+                                </div>
+                            </a>
+                            <div v-else>
+                                <div>
+                                    <p>
+                                        <strong>
+                                            {{ music.Name }}
+                                        </strong>
+                                    </p>
+                                </div>
+                                <div>
+                                    <p>
+                                        {{ music.ArtistName }}
+                                    </p>
+                                </div>
+                            </div>
+                            <input type="hidden" name="tracklist" :value="music.TrackId">
+                        </li>
+                        <a href="#" @click.prevent="openTrackSelectModal" v-if="isLoggedIn && edit" class="add">
+                            Add Track to Release
+                        </a>
+                    </ol>
+                    
+                </div>
+                
+                <div class="actionbuttons">
+                    
+                    <button type="button" @click.prevent="edit = !edit" v-if="isLoggedIn">{{ edit ? "Cancel" : "Edit"
                     }}</button>
                 <input type="submit" v-if="edit && isLoggedIn">
             </div>
         </template>
     </Showcase>
+</form>
     <dialog id="add_tracks_to_release" ref="assigndialog">
-        <AssignTracksReleaseDialog @save="console.log" @close="assigndialog.close()" />
+        <AssignTracksReleaseDialog @save="applySelection" @close="assigndialog.close()" />
     </dialog>
 </template>
 

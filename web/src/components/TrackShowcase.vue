@@ -3,11 +3,12 @@ import { useRouter, useRoute } from 'vue-router'
 import { getDevPrefix, getS3Host } from '../main'
 import Showcase from './Showcase.vue';
 import EditableText from './EditableText.vue';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import type { Music } from '../types';
 import { mapGetters } from 'vuex';
 import AssignedArtistsPicker from './AssignedArtistsPicker.vue';
 import { router } from '../router';
+import { useStore } from 'vuex';
 
 async function fetchData(trackId): Promise<Music> {
 
@@ -39,20 +40,13 @@ const props = defineProps({
 const edit = ref(false)
 const data = ref<Music>();
 
+const store = useStore();
+const isLoggedIn = computed(() => store.getters.isLoggedIn)
+
 data.value = await fetchData(props.trackId)
 
 
 console.log(data)
-</script>
-<script lang="ts">
-export default {
-    methods: {
-
-    },
-    computed: {
-        ...mapGetters(["isLoggedIn"])
-    }
-}
 </script>
 
 <template>
@@ -65,6 +59,11 @@ export default {
             <template #default>
                 <h1 class="title">
                     <EditableText :reverse-style="false" :edit="edit" :value="data.Tracktitle" name="Tracktitle" type="text" />
+                    <div class="delete-tools" v-if="edit">
+
+                            <img class="icon" src="../assets/trash.svg">
+
+                    </div>
                 </h1>
                 <strong>Artist:</strong>
                 <RouterLink :to="'/catalog/artists/' + data.ArtistId" v-if="!edit">{{ data.Artist }}</RouterLink>
@@ -80,7 +79,7 @@ export default {
                 <small v-else>no catalog release</small>
                 <p>Play: </p>
                 <p>
-                    <audio v-if="data.PublicUrl != null" controls :src="data.PublicUrl"></audio>
+                    <audio v-if="data.PublicUrl != null" controls :src="getS3Host() + data.PublicUrl"></audio>
                     <small v-else>stream not available</small>
                 </p>
 
@@ -101,5 +100,12 @@ export default {
 .actionbuttons {
     display: flex;
     gap: 1em;
+}
+
+.title {
+    display: flex;
+}
+.delete-tools {
+    filter: invert(1)
 }
 </style>

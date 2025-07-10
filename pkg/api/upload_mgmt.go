@@ -82,7 +82,7 @@ func FileInboxApi(rg *gin.RouterGroup, db *pgxpool.Pool) {
 		ctx.JSON(http.StatusOK, i)
 	})
 
-	ag.GET("/:id/accept", AdminMiddleware, func(ctx *gin.Context) {
+	ag.POST("/:id/accept", AdminMiddleware, IdChecker, func(ctx *gin.Context) {
 		id := ctx.Param("id")
 		if id == "" {
 			ctx.Status(http.StatusBadRequest)
@@ -95,6 +95,20 @@ func FileInboxApi(rg *gin.RouterGroup, db *pgxpool.Pool) {
 		item.Accept(db)
 
 		ctx.Status(http.StatusOK)
+	})
+
+	ag.POST("/:id/delete", AdminMiddleware, IdChecker, func(ctx *gin.Context) {
+		id := ctx.Param("id")
+
+		item := model.InboxItem{
+			UploadId: id,
+		}
+
+		if err := item.Delete(db); err != nil {
+			ctx.JSON(http.StatusInternalServerError, err)
+		} else {
+			ctx.Status(http.StatusOK)
+		}
 	})
 
 	ag.GET("/count", AdminMiddleware, func(ctx *gin.Context) {

@@ -89,6 +89,28 @@ func (item *InboxItem) FromId(db *pgxpool.Pool, id string) error {
 
 	return item.fromRow(row)
 }
+func (item *InboxItem) Delete(db *pgxpool.Pool) error {
+	tx, err := db.BeginTx(context.Background(), pgx.TxOptions{})
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback(context.Background())
+
+	err = s3store.DeleteTrackFromInbox(item.UploadId + ".wav")
+	if err != nil {
+		return err
+	}
+
+	_, err = tx.Exec(context.Background(), "delete from uploads where id = @id", pgx.NamedArgs{
+		"id": item.UploadId,
+	})
+	if err != nil {
+		return err
+	}
+
+	return tx.Commit(context.Background())
+}
+
 func (item *InboxItem) Accept(db *pgxpool.Pool) error {
 	_, err := db.Query(context.Background(), "update uploads set status='accepted' where id = @id", pgx.NamedArgs{
 		"id": item.UploadId,

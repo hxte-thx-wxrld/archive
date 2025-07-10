@@ -25,7 +25,7 @@ const emit = defineEmits<{
 async function reloadList(page) {
     const req = await fetch(getDevPrefix() + "/api/track/?offset=" + page)
     const j = await req.json();
-    console.table(j.Rows);
+    //console.table(j.Rows);
     return j;
 }
 

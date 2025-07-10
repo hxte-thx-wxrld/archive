@@ -80,7 +80,7 @@ header {
   background-color: white;
   color: black;
   padding: .5em;
-  font-family: "Apricot200L";
+  font-family: "Silkscreen";
 }
 
 .selected {
@@ -90,7 +90,7 @@ header {
 .sub nav {
   padding: 1em 0;
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr;
 }
 
 .sub nav a {
@@ -186,7 +186,7 @@ div,
 form {
   /*font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;*/
   /*font-family: "biosfont";*/
-  font-family: "ApricotXenC";
+  font-family: "DotGothic16";
 
 }
 

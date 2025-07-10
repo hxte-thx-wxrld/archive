@@ -1,7 +1,6 @@
 package api
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -41,12 +40,8 @@ func TrackApi(rg *gin.RouterGroup, db *pgxpool.Pool) {
 		}
 	})
 
-	ag.PUT("/:id", AuthenticatedMiddleware, func(ctx *gin.Context) {
+	ag.PUT("/:id", AuthenticatedMiddleware, IdChecker, func(ctx *gin.Context) {
 		id := ctx.Param("id")
-		if id == "" {
-			ctx.JSON(http.StatusBadRequest, errors.New("invalid track id"))
-			return
-		}
 
 		var t model.Music
 		if err := ctx.BindJSON(&t); err != nil {
@@ -67,12 +62,8 @@ func TrackApi(rg *gin.RouterGroup, db *pgxpool.Pool) {
 		ctx.Status(http.StatusOK)
 	})
 
-	ag.GET("/:id", func(ctx *gin.Context) {
+	ag.GET("/:id", IdChecker, func(ctx *gin.Context) {
 		id := ctx.Param("id")
-		if id == "" {
-			ctx.JSON(http.StatusBadRequest, errors.New("invalid track id"))
-			return
-		}
 
 		track := model.Music{}
 		err := track.FromId(db, id)

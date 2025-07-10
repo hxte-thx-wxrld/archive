@@ -11,6 +11,7 @@ type Artist struct {
 	Name          string
 	ArtistId      *string
 	ArtistPicture string
+	Description   string
 }
 
 type ArtistCreateRequest struct {
@@ -23,7 +24,7 @@ type PaginatedArtistLookup struct {
 }
 
 func (a *PaginatedArtistLookup) AllArtists(db *pgxpool.Pool, offset int) error {
-	rows, err := db.Query(context.Background(), "select id, name, artist_picture from interpret LIMIT @limit OFFSET @offset", pgx.NamedArgs{
+	rows, err := db.Query(context.Background(), "select id, name, artist_picture, description from interpret LIMIT @limit OFFSET @offset", pgx.NamedArgs{
 		"limit":  PAGINATED_COUNT,
 		"offset": offset * PAGINATED_COUNT,
 	})
@@ -58,7 +59,7 @@ func (a *PaginatedArtistLookup) getTotalCount(db *pgxpool.Pool) error {
 
 func (a *Artist) FromId(db *pgxpool.Pool) error {
 	//"select id, name, artist_picture from interpret"
-	row, err := db.Query(context.Background(), "select id, name, artist_picture from interpret where id = @id", pgx.NamedArgs{
+	row, err := db.Query(context.Background(), "select id, name, artist_picture, description from interpret where id = @id", pgx.NamedArgs{
 		"id": a.ArtistId,
 	})
 
@@ -71,7 +72,7 @@ func (a *Artist) FromId(db *pgxpool.Pool) error {
 }
 
 func (a *Artist) fromRow(rows pgx.Rows) error {
-	return rows.Scan(&a.ArtistId, &a.Name, &a.ArtistPicture)
+	return rows.Scan(&a.ArtistId, &a.Name, &a.ArtistPicture, &a.Description)
 }
 
 func (a *Artist) CreateArtist(db *pgxpool.Pool, parentUserId string) error {

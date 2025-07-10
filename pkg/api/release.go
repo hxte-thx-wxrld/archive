@@ -1,7 +1,6 @@
 package api
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -35,12 +34,8 @@ func ReleaseApi(rg *gin.RouterGroup, db *pgxpool.Pool) {
 		ctx.JSON(http.StatusOK, lookup)
 	})
 
-	ag.GET("/:id", func(ctx *gin.Context) {
+	ag.GET("/:id", IdChecker, func(ctx *gin.Context) {
 		id := ctx.Param("id")
-		if id == "" {
-			ctx.JSON(http.StatusBadRequest, errors.New("invalid release id"))
-			return
-		}
 
 		//r, err := GetSingleRelease(db, id)
 		r := model.Release{}
@@ -55,5 +50,26 @@ func ReleaseApi(rg *gin.RouterGroup, db *pgxpool.Pool) {
 		}
 
 		ctx.JSON(http.StatusOK, r)
+	})
+
+	ag.PUT("/:id", IdChecker, func(ctx *gin.Context) {
+		id := ctx.Param("id")
+
+		var r model.Release
+		r.ReleaseId = id
+
+		form, err := ctx.MultipartForm()
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		r.FromMultipartForm(db, form)
+		err = r.Edit(db)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, err)
+		}
+
+		fmt.Println(r)
 	})
 }

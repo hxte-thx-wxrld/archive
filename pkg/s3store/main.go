@@ -3,6 +3,7 @@ package s3store
 import (
 	"context"
 	"embed"
+	"fmt"
 	"io"
 	"log"
 	"mime/multipart"
@@ -32,24 +33,72 @@ func SetupS3Store(statics embed.FS) {
 		log.Fatalln(err)
 	}
 
+	anonPolicyCover, err := statics.ReadFile("assets/anon-policy-covers.json")
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	anonPolicyArtists, err := statics.ReadFile("assets/anon-policy-artists.json")
+	if err != nil {
+		log.Fatalln(err)
+	}
 	if !searchForBucket(result, "covers") {
 		ctx := context.WithoutCancel(context.Background())
 
-		data, err := statics.Open("assets/default.png")
+		data, err := statics.Open("assets/default-cover.png")
 		if err != nil {
 			log.Fatalln(err)
 		}
 		svc.CreateBucket(ctx, &s3.CreateBucketInput{
 			Bucket: aws.String("covers"),
 		})
+		_, err = svc.PutBucketPolicy(context.Background(), &s3.PutBucketPolicyInput{
+			Bucket: aws.String("covers"),
+			Policy: aws.String(string(anonPolicyCover)),
+		})
+
+		if err != nil {
+			log.Fatalln(err)
+		}
+
 		UploadFileToS3(svc, "default.png", "covers", data)
 
+	}
+
+	if !searchForBucket(result, "artists") {
+		ctx := context.WithoutCancel(context.Background())
+
+		data, err := statics.Open("assets/default-artist.png")
+		if err != nil {
+			log.Fatalln(err)
+		}
+		svc.CreateBucket(ctx, &s3.CreateBucketInput{
+			Bucket: aws.String("artists"),
+		})
+
+		_, err = svc.PutBucketPolicy(context.Background(), &s3.PutBucketPolicyInput{
+			Bucket: aws.String("artists"),
+			Policy: aws.String(string(anonPolicyArtists)),
+		})
+		if err != nil {
+			log.Fatalln(err)
+		}
+		UploadFileToS3(svc, "default.png", "artists", data)
 	}
 
 	if !searchForBucket(result, "tracks") {
 		svc.CreateBucket(context.TODO(), &s3.CreateBucketInput{
 			Bucket: aws.String("tracks"),
 		})
+
+		/*_, err = svc.PutBucketPolicy(context.Background(), &s3.PutBucketPolicyInput{
+			Bucket: aws.String("tracks"),
+			Policy: aws.String(string(anonPolicy)),
+		})
+		if err != nil {
+			log.Fatalln(err)
+		}
+		*/
 
 	}
 
@@ -87,4 +136,23 @@ func UploadFileToS3(svc *s3.Client, filename string, bucket_name string, data io
 		Key:    aws.String(filename),
 		Body:   data,
 	})
+}
+
+func DeleteTrackFromInbox(filename string) error {
+	svc, err := NewS3Config()
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	return DeleteFileFromS3(svc, "inbox", filename)
+}
+func DeleteFileFromS3(svc *s3.Client, filename string, bucket_name string) error {
+	o, err := svc.DeleteObject(context.Background(), &s3.DeleteObjectInput{
+		Bucket: aws.String(bucket_name),
+		Key:    aws.String(filename),
+	})
+
+	fmt.Println(o)
+	return err
 }

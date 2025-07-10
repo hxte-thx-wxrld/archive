@@ -1,66 +1,67 @@
 <script setup lang="ts">
 //import UploadComp from './components/UploadComp.vue'
 import { mapGetters } from 'vuex';
-import { ref } from 'vue';
+import { computed, ref, useTemplateRef } from 'vue';
 import ArtistList from '../components/ArtistList.vue';
 import ReleaseList from '../components/ReleaseList.vue';
 import TrackList from '../components/TrackList.vue';
 import TrackUploadDialog from '../components/dialogs/TrackUploadDialog.vue';
 import ArtistCreateDialog from '../components/dialogs/ArtistCreateDialog.vue';
 import ReleaseCreateDialog from '../components/dialogs/ReleaseCreateDialog.vue';
-import DatabaseList from '../components/mixins/DatabaseList.vue';
-import DatabaseListItem from '../components/lists/InboxListMixin.vue';
-import TrackListMixin from '../components/lists/TrackListMixin.vue';
+import InboxList from '../components/InboxList.vue';
 import InboxIndicator from '../components/InboxIndicator.vue';
+import { useStore } from 'vuex';
+import { useRoute, useRouter } from 'vue-router';
 
 const showSearchbar = ref(false)
-</script>
 
-<script lang="ts">
-export default {
-    computed: {
-        ...mapGetters(["isLoggedIn", "isAdmin"])
-    },
-    methods: {
-        getSubmode() {
-            if (!this.$route.params.mode) {
-                return "tracks";
-            } else return this.$route.params.mode;
-        },
-        openCreateTrack(event) {
-            console.log(event);
-            (this.$refs.new_track as HTMLDialogElement).showModal();
-        },
-        closeCreateTrack(event) {
-            (this.$refs.new_track as HTMLDialogElement).close();
-        },
-        openCreateArtist() {
-            (this.$refs.new_artist as HTMLDialogElement).showModal()
-        },
-        openCreateRelease() {
-            (this.$refs.new_release as HTMLDialogElement).showModal()
+const store = useStore()
+const isLoggedIn = computed(() => store.getters.isLoggedIn)
+const isAdmin = computed(() => store.getters.isAdmin)
+const route = useRoute()
+const router = useRouter()
+const new_track = useTemplateRef("new_track")
+const new_artist = useTemplateRef("new_artist")
+const new_release = useTemplateRef("new_release")
 
-        },
-        openTrack(item) {
-            console.log(item)
-            this.$router.push('/catalog/tracks/' + item.TrackId)
-            //:to="'/catalog/tracks/' + item.TrackId"
-        },
-        openRelease(item) {
-            console.log(item)
-            this.$router.push('/catalog/releases/' + item.ReleaseId)
-            //:to="'/catalog/tracks/' + item.TrackId"
-        },
-        openArtist(item) {
-            console.log(item)
-            this.$router.push('/catalog/artists/' + item.ArtistId)
-            //:to="'/catalog/tracks/' + item.TrackId"
-        },
-        openInbox() {
-            alert("inbox")
-        }
-    }
+function getSubmode() {
+    if (!route.params.mode) {
+        return "tracks";
+    } else return route.params.mode;
 }
+function openCreateTrack(event) {
+    console.log(event);
+    (new_track.value as HTMLDialogElement).showModal();
+}
+function closeCreateTrack(event) {
+    (new_track.value as HTMLDialogElement).close();
+}
+function openCreateArtist() {
+    (new_artist.value as HTMLDialogElement).showModal()
+}
+function openCreateRelease() {
+    (new_release.value as HTMLDialogElement).showModal()
+
+}
+function openTrack(item) {
+    console.log(item)
+    router.push('/catalog/tracks/' + item.TrackId)
+    //:to="'/catalog/tracks/' + item.TrackId"
+}
+function openRelease(item) {
+    console.log(item)
+    router.push('/catalog/releases/' + item.ReleaseId)
+    //:to="'/catalog/tracks/' + item.TrackId"
+}
+function openArtist(item) {
+    console.log(item)
+    router.push('/catalog/artists/' + item.ArtistId)
+    //:to="'/catalog/tracks/' + item.TrackId"
+}
+function openInbox() {
+    alert("inbox")
+}
+
 </script>
 
 <template>
@@ -104,13 +105,16 @@ export default {
         <h1>Inbox</h1>
         <RouterLink class="icon tracks" to="/catalog/tracks" v-if="isAdmin">Go back</RouterLink>
         <Suspense>
+            <!--
             <DatabaseList api-endpoint="/api/inbox/" :small="true">
                 <DatabaseListItem></DatabaseListItem>
-                <!--<div class="row" v-for="(item, index) in $refs.inboxlist.Rows" v-if="data != null">
+                <div class="row" v-for="(item, index) in $refs.inboxlist.Rows" v-if="data != null">
                     {{ item }}
-                </div>-->
-
+                </div>
+                
             </DatabaseList>
+            -->
+            <InboxList></InboxList>
         </Suspense>
     </div>
     <div v-else-if="getSubmode() == 'releases'">
@@ -182,7 +186,7 @@ nav {
     border-bottom: 3px solid white;
     background-color: transparent;
     color: white;
-    font-family: "Apricot200L";
+    font-family: "PixelifySans";
 }
 
 .tools .go:active {
@@ -195,7 +199,7 @@ nav {
     border: unset;
     background-color: white;
     color: black;
-    font-family: "Apricot200L";
+    font-family: "Silkscreen";
     padding: 1em;
     margin: 0 .5em;
 }
@@ -229,6 +233,6 @@ nav.mode>* {
     background-color: white;
     color: black;
     padding: .5em;
-    font-family: "Apricot200L";
+    font-family: "Silkscreen";
 }
 </style>

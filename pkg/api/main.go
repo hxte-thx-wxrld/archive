@@ -16,6 +16,16 @@ type LoginRequest struct {
 	Password string `json:"password"`
 }
 
+// Checks, if the request has given an id
+func IdChecker(ctx *gin.Context) {
+	objId := ctx.Param("id")
+	if objId == "" {
+		ctx.JSON(http.StatusBadRequest, errors.New("no id given"))
+	} else {
+		ctx.Next()
+	}
+}
+
 func InitApi(rg *gin.RouterGroup, db *pgxpool.Pool) {
 	TrackApi(rg, db)
 	ArtistApi(rg, db)

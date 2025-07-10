@@ -1,19 +1,20 @@
-// generated using github.com/32leaves/bel on 2025-07-09 23:45:05.163661 +0200 CEST m=+0.001975917
+// generated using github.com/32leaves/bel on 2025-07-10 15:29:47.657006 +0200 CEST m=+0.002898251
 // DO NOT MODIFY
 
 export interface PaginatedArtistLookup {
     Rows: Artist[]
     FullLength: number
 }
-// generated using github.com/32leaves/bel on 2025-07-09 23:45:05.16445 +0200 CEST m=+0.002765334
+// generated using github.com/32leaves/bel on 2025-07-10 15:29:47.65771 +0200 CEST m=+0.003602626
 // DO NOT MODIFY
 
 export interface Artist {
     Name: string
     ArtistId: string
     ArtistPicture: string
+    Description: string
 }
-// generated using github.com/32leaves/bel on 2025-07-09 23:45:05.164561 +0200 CEST m=+0.002876459
+// generated using github.com/32leaves/bel on 2025-07-10 15:29:47.657816 +0200 CEST m=+0.003708001
 // DO NOT MODIFY
 
 export interface Music {
@@ -28,7 +29,7 @@ export interface Music {
     CoverUrl: string
     Length: string
 }
-// generated using github.com/32leaves/bel on 2025-07-09 23:45:05.164696 +0200 CEST m=+0.003011417
+// generated using github.com/32leaves/bel on 2025-07-10 15:29:47.657946 +0200 CEST m=+0.003838292
 // DO NOT MODIFY
 
 export interface Release {
@@ -40,16 +41,16 @@ export interface Release {
     CoverUrl: string
     RelatedMusic: MusicInRelease[]
 }
-// generated using github.com/32leaves/bel on 2025-07-09 23:45:05.164811 +0200 CEST m=+0.003126126
+// generated using github.com/32leaves/bel on 2025-07-10 15:29:47.658054 +0200 CEST m=+0.003946126
 // DO NOT MODIFY
 
 export interface MusicInRelease {
     TrackId: string
     Name: string
-    Order: number
+    Position: number
     ArtistName: string
 }
-// generated using github.com/32leaves/bel on 2025-07-09 23:45:05.16492 +0200 CEST m=+0.003235751
+// generated using github.com/32leaves/bel on 2025-07-10 15:29:47.658199 +0200 CEST m=+0.004091626
 // DO NOT MODIFY
 
 export interface InboxItem {
@@ -62,7 +63,7 @@ export interface InboxItem {
     Status: string
     ReleaseDate: string
 }
-// generated using github.com/32leaves/bel on 2025-07-09 23:45:05.165046 +0200 CEST m=+0.003361792
+// generated using github.com/32leaves/bel on 2025-07-10 15:29:47.658314 +0200 CEST m=+0.004206376
 // DO NOT MODIFY
 
 export interface PaginatedInboxItems {

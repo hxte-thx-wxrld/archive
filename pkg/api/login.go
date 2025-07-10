@@ -62,7 +62,7 @@ func GetAssignedArtists(db *pgxpool.Pool, userid string) ([]model.Artist, error)
 		return nil, err
 	}
 
-	var a []model.Artist
+	a := []model.Artist{}
 	for rows.Next() {
 		var artist model.Artist
 
