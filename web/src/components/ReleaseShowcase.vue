@@ -7,9 +7,15 @@ import AssignTracksReleaseDialog from './dialogs/AssignTracksReleaseDialog.vue';
 import { computed, ref } from 'vue';
 import type { Music, Release } from '../types';
 import { useStore } from 'vuex';
+import { useRouter } from 'vue-router';
 
-function openTrackSelectModal(event: MouseEvent) {
+const router = useRouter()
+
+function openTrackSelectModal() {
     assigndialog.value.showModal()
+}
+function closeTrackSelectModal() {
+    assigndialog.value.close()
 }
 
 async function fetchData(releaseId): Promise<Release> {
@@ -39,6 +45,9 @@ async function save(submitEvent: SubmitEvent) {
         method: "PUT",
         body: fdata
     })
+    edit.value = false;
+    data.value = await(fetchData(props.releaseId))
+    closeTrackSelectModal()
 }
 
 const props = defineProps({
@@ -48,7 +57,6 @@ const props = defineProps({
 const edit = ref(false);
 const assigndialog = ref<HTMLDialogElement>()
 const data = ref<Release>(await fetchData(props.releaseId));
-const temporary = ref<Music[]>([])
 
 const store = useStore();
 const isLoggedIn = computed(() => store.getters.isLoggedIn);

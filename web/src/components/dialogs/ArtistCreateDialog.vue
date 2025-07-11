@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import EditableText from '../EditableText.vue';
+import { useRouter } from 'vue-router';
 
 const name = ref("")
+const router = useRouter();
 
 async function create(event: SubmitEvent) {
     const body = new FormData(event.target as HTMLFormElement)
@@ -17,7 +19,7 @@ async function create(event: SubmitEvent) {
     const res = await req.json()
     console.log(res)
 
-
+    router.push("/catalog/artists/" + res.ArtistId)
 }
 
 </script>

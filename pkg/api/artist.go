@@ -60,7 +60,7 @@ func ArtistApi(rg *gin.RouterGroup, db *pgxpool.Pool) {
 
 		fmt.Println("new id: ", id)
 
-		ctx.Status(http.StatusOK)
+		ctx.JSON(http.StatusOK, req)
 	})
 
 	ag.GET("/:id", IdChecker, func(ctx *gin.Context) {

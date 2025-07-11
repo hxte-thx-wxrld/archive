@@ -94,6 +94,6 @@ func ReleaseApi(rg *gin.RouterGroup, db *pgxpool.Pool) {
 
 		fmt.Println("new id: ", req.ReleaseId)
 
-		ctx.Status(http.StatusOK)
+		ctx.JSON(http.StatusOK, req)
 	})
 }
