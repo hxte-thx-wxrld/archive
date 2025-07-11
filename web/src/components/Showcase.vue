@@ -5,14 +5,14 @@ export default {
 </script>
 
 <template>
-    <div class="showcase">
-        <div class="left">
-            <slot name="left"></slot>
-        </div>
-        <div class="meta">
-            <slot></slot>
-        </div>
+  <div class="showcase">
+    <div class="left">
+      <slot name="left"></slot>
     </div>
+    <div class="meta">
+      <slot></slot>
+    </div>
+  </div>
 </template>
 
 <style>
@@ -39,6 +39,6 @@ export default {
 .showcase .meta .title {
   grid-column-start: 1;
   grid-column-end: 3;
-    padding: 0 0 1em 0;
+  padding: 0 0 1em 0;
 }
 </style>

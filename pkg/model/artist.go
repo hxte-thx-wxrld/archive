@@ -34,16 +34,15 @@ func (a *PaginatedArtistLookup) AllArtists(db *pgxpool.Pool, offset int) error {
 
 	a.getTotalCount(db)
 
-	defer rows.Close()
-
 	return a.fromRow(rows)
 }
 func (a *PaginatedArtistLookup) fromRow(rows pgx.Rows) error {
+	a.Rows = []Artist{}
 	for rows.Next() {
 
 		artist := Artist{}
 		artist.fromRow(rows)
-		rows.Scan(&artist.ArtistId, &artist.Name, &artist.ArtistPicture)
+		rows.Scan(&artist.ArtistId, &artist.Name, &artist.ArtistPicture, &artist.Description)
 		a.Rows = append(a.Rows, artist)
 	}
 

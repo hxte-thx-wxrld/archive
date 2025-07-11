@@ -1,25 +1,25 @@
 <script setup lang="ts">
+import { ref } from 'vue';
+import EditableText from '../EditableText.vue';
 
-</script>
+const name = ref("")
 
-<script lang="ts">
-export default {
-    data() {
-        return {}
-    },
-    methods: {
-        async create(event: SubmitEvent) {
-            const body = new FormData(event.target as HTMLFormElement)
-            const req = await fetch("/api/artist", {
-                method: "POST",
-                body: JSON.stringify({
-                    "Name": body.get("name")
-                })
-            })
+async function create(event: SubmitEvent) {
+    const body = new FormData(event.target as HTMLFormElement)
+    console.log(body.get("Name"))
+    const req = await fetch("/api/artist", {
+        method: "POST",
+        body: JSON.stringify({
+            "Name": body.get("Name")
+        })
+    })
+    
+    const res = await req.json()
+    console.log(res)
 
-        }
-    }
+
 }
+
 </script>
 
 <template>
@@ -27,7 +27,7 @@ export default {
         <p class="title">Create new Artist</p>
 
         <label for="name">Artist Name</label>
-        <input type="text" name="name">
+        <EditableText :edit="true" :reverse-style="true" :value="name" type="text" name="Name"></EditableText>
 
         <input type="submit">
     </form>
@@ -38,6 +38,7 @@ form {
     display: grid;
     grid-template-columns: 1fr 1fr;
 }
+
 form .title {
     grid-column-start: 1;
     grid-column-end: 3;

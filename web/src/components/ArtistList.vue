@@ -1,30 +1,17 @@
 <script setup lang="ts">
 import { mapGetters } from 'vuex'
 import CreateArtistDialog from './dialogs/ArtistCreateDialog.vue'
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import type { Artist, PaginatedArtistLookup } from '../types'
+import { useStore } from 'vuex';
 
 const data = ref<PaginatedArtistLookup>();
 const req = await fetch("/api/artist?offset=0")
 data.value = await req.json()
-
+const store = useStore();
+const isLoggedIn = computed(() => store.getters.isLoggedIn)
 console.log(data.value)
-</script>
-<script lang="ts">
-export default {
-    components: {
-        CreateArtistDialog: CreateArtistDialog
-    },
-    methods: {
 
-    },
-    computed: {
-        ...mapGetters(["isLoggedIn"])
-    },
-    data() {
-        return {}
-    }
-}
 </script>
 
 <template>

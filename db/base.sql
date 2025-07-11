@@ -544,7 +544,7 @@ ALTER TABLE ONLY public.analysis
 --
 
 ALTER TABLE ONLY public.artists_of_user
-    ADD CONSTRAINT artists_of_user_interpret_fk FOREIGN KEY (artist_id) REFERENCES public.interpret(id);
+    ADD CONSTRAINT artists_of_user_interpret_fk FOREIGN KEY (artist_id) REFERENCES public.interpret(id) ON DELETE CASCADE;
 
 
 --
@@ -552,7 +552,7 @@ ALTER TABLE ONLY public.artists_of_user
 --
 
 ALTER TABLE ONLY public.artists_of_user
-    ADD CONSTRAINT artists_of_user_users_fk FOREIGN KEY (user_id) REFERENCES public.users(id);
+    ADD CONSTRAINT artists_of_user_users_fk FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
 
 
 --

@@ -142,7 +142,7 @@ func (item *InboxItem) RegisterUpload(db *pgxpool.Pool, fileobj multipart.File, 
 
 	var status string
 	if admin {
-		status = "waiting"
+		status = "accepted"
 	} else {
 		status = "waiting"
 	}
