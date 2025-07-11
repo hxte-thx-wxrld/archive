@@ -8,13 +8,11 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    volumes:
-      - "./aws:/root/.aws"
     ports:
       - 8080:8080
     environment:
-      EXTERNAL_S3_ENDPOINT: http://127.0.0.1:9000
-      INTERNAL_S3_ENDPOINT: http://minio:9000
+      EXTERNAL_S3_ENDPOINT: http://127.0.0.1:9000 # endpoint which will be reachable from the client
+      INTERNAL_S3_ENDPOINT: http://minio:9000 # endpoint which will be reachable from the docker container
       ROOT_PASSWORD: "rootpassword"
       S3_ROOT_ACCESS_KEY: admin
       S3_ROOT_SECRET_KEY: changeme
@@ -30,6 +28,7 @@ services:
       WORKER_PG_USER: pguser
       WORKER_PG_PASSWORD: pgpassword
       WORKER_PG_SCHEMA: public
+      GIN_MODE: release
 
   #weed:
   #  image: chrislusf/seaweedfs # use a remote image

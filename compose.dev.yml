@@ -53,19 +53,6 @@ services:
       WORKER_PG_PASSWORD: pgpassword
       WORKER_PG_SCHEMA: public
 
-  #weed:
-  #  image: chrislusf/seaweedfs # use a remote image
-  #  restart: always
-  #  ports:
-  #    - 8333:8333
-  #  command: "-v=2 server -s3 -dir=/data -idleTimeout=0 -s3.config=/etc/seaweedfs/config.json"
-
-  #  volumes:
-      #- "/mnt/hdd/seaweed:/data"
-  #    - "./appdata/seaweed:/data"
-  #    - "./s3/config.json:/etc/seaweedfs/config.json"
-  #    - "./s3/filer.toml:/etc/seaweedfs/filer.toml"
-
 # Use postgres/example user/password credentials
   db:
     image: postgres
@@ -93,18 +80,6 @@ services:
       POSTGRES_PASSWORD: pgpassword
       POSTGRES_USER: pguser
 
-  #daemon:
-  #  build:
-  #    context: .
-  #    dockerfile: Dockerfile.daemon
-  #  environment:
-  #    #CRON_SAMPLE: '* * * * * echo 1 minute cron'
-  #    CRON_ANOTHER_SAMPLE: '0 2 * * * python3 /app/sync_s3.py'
-  #  depends_on:
-  #    db:
-  #      condition: service_healthy
-  #      restart: true
-
   web:
     image: nginx
     volumes:
@@ -129,9 +104,3 @@ services:
       - 9000:9000
       - 9001:9001
     command: server --console-address :9001 /data --console-address :9001
-# MINIO_VOLUMES sets the storage volume or path to use for the MinIO server.
-
-
-# MINIO_OPTS sets any additional commandline options to pass to the MinIO server.
-# For example, `--console-address :9001` sets the MinIO Console listen port
-

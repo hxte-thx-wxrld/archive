@@ -181,7 +181,7 @@ CREATE TABLE public.interpret (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
     name character varying(255) NOT NULL,
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
-    artist_picture text DEFAULT '/artists/default.jpg'::text NOT NULL,
+    artist_picture text DEFAULT '/artists/default.png'::text NOT NULL,
     description text DEFAULT 'No description given'::text NOT NULL
 );
 

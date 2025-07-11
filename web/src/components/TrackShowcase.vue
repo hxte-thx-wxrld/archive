@@ -136,7 +136,7 @@ console.log(data)
 
         <div class="a-title">
             <span>Analysis Data</span>
-             <a :href="'/api/track/' + props.trackId + '/analysis?type=json'" >Save</a>
+             <a :href="'/api/track/' + props.trackId + '/analysis?type=json'" >Download</a>
         </div>
         <div class="table">
             <div class="a-row">
@@ -193,7 +193,7 @@ console.log(data)
     font-size: 2em;
 }
 .a-title a {
-    font-size: 1em;
+    font-size: .5em;
 }
 
 .actionbuttons {

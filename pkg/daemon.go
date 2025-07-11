@@ -4,6 +4,7 @@ import (
 	"context"
 	"embed"
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"time"
@@ -67,7 +68,7 @@ func postgresListener(scripts *embed.FS) {
 
 	listener := &pgxlisten.Listener{
 		Connect: func(ctx context.Context) (*pgx.Conn, error) {
-			return pgx.Connect(ctx, os.Getenv("PG_URL"))
+			return pgx.Connect(ctx, GetDatabaseUri())
 		},
 	}
 
@@ -85,7 +86,10 @@ func postgresListener(scripts *embed.FS) {
 	}))
 
 	go func() {
-		listener.Listen(context.Background())
+		err := listener.Listen(context.Background())
+		if err != nil {
+			log.Fatal(err)
+		}
 	}()
 }
 
