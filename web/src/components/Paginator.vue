@@ -28,7 +28,7 @@ export default {
 </template>
 
 <style scoped>
-.p-container {
+/*.p-container {
     display: flex;
     flex-direction: row;
     gap: .2em;
@@ -43,5 +43,5 @@ export default {
 .selected {
     background-color: white !important;
     color: black !important;
-}
+}*/
 </style>

@@ -94,42 +94,47 @@ console.log(data.value)
                 
                 <div class="tracklist">
                     <h2>Track List</h2>
-                    <ol class="tracklist">
-                        <li v-for="(music, index) in data.RelatedMusic" >
-                            <a :href="'/catalog/tracks/' + music.TrackId" v-if="!edit">
-                                <div>
-                                    <p>
-                                        <strong>
-                                            {{ music.Name }}
-                                        </strong>
-                                    </p>
-                                </div>
-                                <div>
-                                    <p>
-                                        {{ music.ArtistName }}
-                                    </p>
-                                </div>
-                            </a>
-                            <div v-else>
-                                <div>
-                                    <p>
-                                        <strong>
-                                            {{ music.Name }}
-                                        </strong>
-                                    </p>
-                                </div>
-                                <div>
-                                    <p>
-                                        {{ music.ArtistName }}
-                                    </p>
-                                </div>
-                            </div>
-                            <input type="hidden" name="tracklist" :value="music.TrackId">
-                        </li>
-                        <a href="#" @click.prevent="openTrackSelectModal" v-if="isLoggedIn && edit" class="add">
+                    <div v-for="(music, index) in data.RelatedMusic">
+
+                    </div>
+<!-- 
+    <ol class="tracklist">
+        <li v-for="(music, index) in data.RelatedMusic" >
+            <a :href="'/catalog/tracks/' + music.TrackId" v-if="!edit">
+                <div>
+                    <p>
+                        <strong>
+                            {{ music.Name }}
+                        </strong>
+                    </p>
+                </div>
+                <div>
+                    <p>
+                        {{ music.ArtistName }}
+                    </p>
+                </div>
+            </a>
+            <div v-else>
+                <div>
+                    <p>
+                        <strong>
+                            {{ music.Name }}
+                        </strong>
+                    </p>
+                </div>
+                <div>
+                    <p>
+                        {{ music.ArtistName }}
+                    </p>
+                </div>
+            </div>
+            <input type="hidden" name="tracklist" :value="music.TrackId">
+        </li>
+    </ol>
+        -->
+        <a href="#" @click.prevent="openTrackSelectModal" v-if="isLoggedIn && edit" class="add">
                             Add Track to Release
                         </a>
-                    </ol>
                     
                 </div>
                 
@@ -148,6 +153,9 @@ console.log(data.value)
 </template>
 
 <style scoped>
+.tracklist ol {
+    margin-block-start: 2em;
+}
 .actionbuttons {
     display: flex;
     gap: 1em;

@@ -4,7 +4,6 @@ import (
 	"context"
 	"embed"
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 	"time"
@@ -49,23 +48,7 @@ func runScript(scripts *embed.FS, name string, id string) {
 	*/
 }
 
-func daemon(b chan bool) {
-	i := 0
-	for {
-		if i > 100 {
-			break
-		}
-		//fmt.Println("Daemon Test")
-		time.Sleep(5 * time.Second)
-		i++
-	}
-
-	b <- true
-}
-
-func postgresListener(scripts *embed.FS) {
-	//testchannel := make(chan *pgconn.Notification)
-
+func postgresListener(ctx context.Context, scripts *embed.FS) {
 	listener := &pgxlisten.Listener{
 		Connect: func(ctx context.Context) (*pgx.Conn, error) {
 			return pgx.Connect(ctx, GetDatabaseUri())
@@ -86,16 +69,18 @@ func postgresListener(scripts *embed.FS) {
 	}))
 
 	go func() {
-		err := listener.Listen(context.Background())
+		err := listener.Listen(ctx)
+		fmt.Println("Post Daemon")
 		if err != nil {
-			log.Fatal(err)
+			fmt.Println(err)
+			return
 		}
 	}()
+
 }
 
-func DefaultDaemon(scripts *embed.FS) chan bool {
-	done := make(chan bool)
-	postgresListener(scripts)
-	go daemon(done)
-	return done
+func DefaultDaemon(ctx context.Context, scripts *embed.FS) {
+
+	postgresListener(ctx, scripts)
+	//go daemon(done)
 }

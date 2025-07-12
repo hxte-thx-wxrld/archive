@@ -3,54 +3,30 @@ import { mapGetters } from 'vuex';
 import HelloWorld from './components/HelloWorld.vue'
 import LoginDialog from './components/dialogs/LoginDialog.vue'
 import { mapState } from 'vuex';
+import HeaderView from './components/HeaderView.vue';
+import { computed, onMounted, useTemplateRef } from 'vue';
+import { useStore } from 'vuex';
 
-</script>
-<script lang="ts">
-export default {
-  mounted() {
-    this.$store.dispatch("fetchConfig")
-    this.$store.dispatch("fetchSelfUser")
-  },
-  methods: {
-    showLoginModal(event) {
-      (this.$refs.loginDialog as HTMLDialogElement).showModal();
-    },
-    hideLoginModal(event) {
-      (this.$refs.loginDialog as HTMLDialogElement).close();
-    },
-  },
-  data() {
-    return {
+const store = useStore()
+const loginDialog = useTemplateRef("loginDialog")
+const isLoggedIn = computed(() => store.getters.isLoggedIn)
+const mounted = onMounted(() => {
+  store.dispatch("fetchConfig")
+  store.dispatch("fetchSelfUser")
+})
 
-    }
-  },
-  computed: {
-    ...mapGetters(["isLoggedIn"])
-  }
+
+function showLoginModal(event) {
+  loginDialog.value.showModal();
+}
+function hideLoginModal(event) {
+  loginDialog.value.close();
 }
 </script>
 
 <template>
   <div class="root">
-    <header>
-      <div class="top">
-        <RouterLink to="/">
-          <img class="logo" src="./assets/logo.png">
-        </RouterLink>
-        <!--
-          <RouterLink class="action" to="/upload">
-            upload
-          </RouterLink>
-          -->
-      </div>
-      <div class="sub">
-        <nav>
-          <RouterLink :class="$route.name == 'tracks'" to="/catalog">Catalog</RouterLink>
-          <!-- <RouterLink :class="$route.name == 'artists'" to="/artist">Art Gallery</RouterLink> -->
-          <RouterLink :class="$route.name == 'releases'" to="/about">About</RouterLink>
-        </nav>
-      </div>
-    </header>
+    <HeaderView></HeaderView>
     <main>
       <RouterView />
     </main>
@@ -64,49 +40,14 @@ export default {
         </dialog>
       </div>
       <div v-else>
-        <a href="#" @click.prevent="$store.dispatch('logout')">Logout</a>
-        <span>{{ $store.Username }}</span>
+        <a href="#" @click.prevent="store.dispatch('logout')">Logout</a>
+        <span>{{ store.Username }}</span>
       </div>
     </footer>
   </div>
 </template>
 
 <style scoped>
-header {
-  padding: 1em 0;
-}
-
-.sub nav * {
-  background-color: white;
-  color: black;
-  padding: .5em;
-  font-family: "Silkscreen";
-}
-
-.selected {
-  background-color: grey;
-}
-
-.sub nav {
-  padding: 1em 0;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-}
-
-.sub nav a {
-  justify-self: center;
-}
-
-header .top {
-  display: grid;
-  grid-template-columns: 1fr;
-}
-
-header .top .action {
-  align-self: center;
-  justify-self: end;
-}
-
 footer {
   padding: 1em 0;
 }
@@ -268,8 +209,7 @@ input[type=submit] {
 
 input[type=text],
 input[type=password],
-input[type=date]
- {
+input[type=date] {
   font-family: inherit;
   font-size: inherit;
   color: white;
@@ -280,8 +220,7 @@ input[type=date]
 
 input[type=text].reverse,
 input[type=password].reverse,
-input[type=date].reverse
- {
+input[type=date].reverse {
   background-color: white;
   border-bottom: 3px solid black;
   color: black;
@@ -289,75 +228,5 @@ input[type=date].reverse
 
 button:active {
   background-color: grey;
-}
-
-/* iphone */
-@media only screen and (max-width: 600px) {
-  .showcase {
-    grid-template-columns: 1fr;
-    justify-items: center;
-  }
-
-  .showcase .meta {
-    display: grid;
-    grid-template-columns: 1fr;
-    margin: 1em;
-    justify-self: left;
-  }
-
-  .showcase .cover-area img {
-    width: 100%;
-    height: auto;
-    border: unset;
-  }
-
-  .showcase .meta :nth-child(2n) {
-    padding: 0 0 1em 0;
-  }
-
-  .root {
-    padding: 1em;
-  }
-
-  .top .logo {
-    width: 100%;
-  }
-
-}
-
-/* tablets */
-@media only screen and (min-width: 600px) {
-  .showcase {
-    grid-template-columns: 1fr;
-  }
-
-  .root {
-    padding: 0 5em;
-  }
-
-  .top .logo {
-    width: 100%;
-  }
-
-}
-
-/*desktop*/
-@media only screen and (min-width: 768px) {
-  .showcase {
-    grid-template-columns: 256px 1fr;
-    gap: 4em;
-  }
-
-  .root {
-    padding: 0 10em;
-  }
-
-  .top .logo {
-    width: 50%;
-  }
-
-  header .top a {
-    text-align: center;
-  }
 }
 </style>
