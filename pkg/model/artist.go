@@ -31,10 +31,16 @@ func (a *PaginatedArtistLookup) AllArtists(db *pgxpool.Pool, offset int) error {
 	if err != nil {
 		return err
 	}
+	defer rows.Close()
 
 	a.getTotalCount(db)
 
-	return a.fromRow(rows)
+	err = a.fromRow(rows)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 func (a *PaginatedArtistLookup) fromRow(rows pgx.Rows) error {
 	a.Rows = []Artist{}
@@ -67,13 +73,22 @@ func (a *Artist) FromId(db *pgxpool.Pool) error {
 	if err != nil {
 		return err
 	}
+	defer row.Close()
 
 	row.Next()
-	return a.fromRow(row)
+	err = a.fromRow(row)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (a *Artist) fromRow(rows pgx.Rows) error {
-	return rows.Scan(&a.ArtistId, &a.Name, &a.ArtistPicture, &a.Description)
+	err := rows.Scan(&a.ArtistId, &a.Name, &a.ArtistPicture, &a.Description)
+	defer rows.Close()
+
+	return err
 }
 
 func (a *Artist) CreateArtist(db *pgxpool.Pool, parentUserId string) error {

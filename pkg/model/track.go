@@ -92,7 +92,9 @@ func (m *PaginatedMusicLookup) getTotalCount(db *pgxpool.Pool) error {
 func (m *PaginatedMusicLookup) fromRow(rows pgx.Rows) error {
 	for rows.Next() {
 		entry := Music{}
-		entry.fromRow(rows)
+		if err := entry.fromRow(rows); err != nil {
+			return err
+		}
 		m.Rows = append(m.Rows, entry)
 	}
 	return nil
@@ -106,6 +108,7 @@ func (m *Music) FromId(db *pgxpool.Pool, id string) error {
 	if err != nil {
 		return err
 	}
+	defer row.Close()
 
 	row.Next()
 	return m.fromRow(row)
@@ -120,14 +123,14 @@ func (m *Music) fromRow(row pgx.Rows) error {
 }
 
 func (m *Music) EditTrack(db *pgxpool.Pool) error {
-	row := db.QueryRow(context.Background(), "update music set title=@title, artist_id=@artistId, release_date=@releasedate WHERE id=@id", pgx.NamedArgs{
+	_, err := db.Exec(context.Background(), "update music set title=@title, artist_id=@artistId, release_date=@releasedate WHERE id=@id", pgx.NamedArgs{
 		"title":       m.Tracktitle,
 		"artistId":    m.ArtistId,
 		"releasedate": m.ReleaseDate,
 		"id":          m.TrackId,
 	})
 
-	return row.Scan()
+	return err
 }
 
 func (item *Music) Delete(db *pgxpool.Pool) error {

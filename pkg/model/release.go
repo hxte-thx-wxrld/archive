@@ -47,7 +47,12 @@ func (r *ReleasesLookup) AllReleases(db *pgxpool.Pool, offset int) error {
 		return err
 	}
 
-	return r.fromRow(db, rows)
+	err = r.fromRow(db, rows)
+	if err != nil {
+		return err
+	}
+	rows.Close()
+	return err
 }
 
 func (r *ReleasesLookup) fromRow(db *pgxpool.Pool, rows pgx.Rows) error {
@@ -156,6 +161,8 @@ func (r *Release) FromId(db *pgxpool.Pool, id string) error {
 		return err
 	}
 
+	row.Close()
+
 	return err
 }
 
@@ -183,6 +190,8 @@ func (r *Release) getAssociatedMusic(db *pgxpool.Pool) error {
 
 		r.RelatedMusic = append(r.RelatedMusic, t)
 	}
+
+	rows.Close()
 	return nil
 }
 

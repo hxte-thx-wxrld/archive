@@ -43,6 +43,7 @@ func (p *PaginatedInboxItems) AllWaitingInboxItems(db *pgxpool.Pool, page int) e
 		fmt.Println(err)
 		return err
 	}
+	defer row.Close()
 
 	err = p.getTotalCount(db)
 	if err != nil {
@@ -89,6 +90,8 @@ func (item *InboxItem) FromId(db *pgxpool.Pool, id string) error {
 		return err
 	}
 
+	defer row.Close()
+
 	return item.fromRow(row)
 }
 func (item *InboxItem) Delete(db *pgxpool.Pool) error {
@@ -114,7 +117,7 @@ func (item *InboxItem) Delete(db *pgxpool.Pool) error {
 }
 
 func (item *InboxItem) Accept(db *pgxpool.Pool) error {
-	_, err := db.Query(context.Background(), "update uploads set status='accepted' where id = @id", pgx.NamedArgs{
+	_, err := db.Exec(context.Background(), "update uploads set status='accepted' where id = @id", pgx.NamedArgs{
 		"id": item.UploadId,
 	})
 

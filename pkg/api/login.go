@@ -100,6 +100,8 @@ func GetAssignedArtists(db *pgxpool.Pool, userid string) ([]model.Artist, error)
 
 		a = append(a, artist)
 	}
+
+	rows.Close()
 	return a, nil
 }
 

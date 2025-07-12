@@ -30,6 +30,7 @@ func (u *User) GetAssignedArtists(db *pgxpool.Pool, userid string) error {
 	if err != nil {
 		return err
 	}
+	defer rows.Close()
 
 	for rows.Next() {
 		var artist Artist
@@ -42,6 +43,7 @@ func (u *User) GetAssignedArtists(db *pgxpool.Pool, userid string) error {
 		}
 		u.AssignedArtists = append(u.AssignedArtists, artist)
 	}
+
 	return nil
 }
 

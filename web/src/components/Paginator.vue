@@ -35,13 +35,13 @@ export default {
 }
 
 .p-container a {
-    background-color: white;
-    color: black;
+    background-color: black;
+    color: white;
     padding: .2em;
 }
 
 .selected {
-    background-color: black !important;
-    color: white !important;
+    background-color: white !important;
+    color: black !important;
 }
 </style>

@@ -34,11 +34,13 @@ const uploadTrack = async (event: SubmitEvent) => {
 </script>
 
 <template>
-    <form @submit.prevent="uploadTrack" ref="track_upload_form">
+    <form v-if="showfinishedMessage">
+        <span class="full-width">Upload Successful!</span>
+    </form>
+    <form @submit.prevent="uploadTrack" ref="track_upload_form" v-else>
 
         <h2 class="full-width">Create new Track</h2>
 
-        <span class="full-width">Upload Successful!</span>
 
         <label for="Trackname">Trackname:</label>
         <input type="text" class="reverse" name="Trackname">

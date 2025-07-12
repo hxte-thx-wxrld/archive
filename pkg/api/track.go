@@ -30,8 +30,6 @@ func TrackApi(rg *gin.RouterGroup, db *pgxpool.Pool) {
 		lookup := model.PaginatedMusicLookup{}
 		err = lookup.AllTracks(db, offset_int)
 
-		fmt.Println(lookup)
-
 		if err != nil {
 			log.Println(err)
 			ctx.JSON(http.StatusInternalServerError, err)
@@ -67,8 +65,6 @@ func TrackApi(rg *gin.RouterGroup, db *pgxpool.Pool) {
 
 		track := model.Music{}
 		err := track.FromId(db, id)
-
-		fmt.Println(track)
 
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, err)

@@ -32,6 +32,22 @@ func IdChecker(ctx *gin.Context) {
 }
 
 func InitApi(rg *gin.RouterGroup, db *pgxpool.Pool) {
+
+	rg.Use(func(ctx *gin.Context) {
+		ctx.Next()
+		stats := db.Stat()
+		fmt.Println("Database Stats")
+		fmt.Println("Acquired Count:", stats.AcquireCount())
+		fmt.Println("Acquired Duration:", stats.AcquireDuration())
+		fmt.Println("Acquired Conns:", stats.AcquiredConns())
+		fmt.Println("Contructing Conns:", stats.ConstructingConns())
+		fmt.Println("Empty Acquire Conns:", stats.EmptyAcquireCount())
+		fmt.Println("Canceled Acquire Conns:", stats.CanceledAcquireCount())
+		fmt.Println("Idle Conns:", stats.IdleConns())
+		fmt.Println("Max Conns:", stats.MaxConns())
+		fmt.Println("Total Conns:", stats.TotalConns())
+
+	})
 	TrackApi(rg, db)
 	ArtistApi(rg, db)
 	ReleaseApi(rg, db)
