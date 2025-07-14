@@ -15,7 +15,7 @@ export default {
   </div>
 </template>
 
-<style scoped>
+<style>
 /* iphone */
 @media only screen and (max-width: 768px) {
   .showcase {
@@ -55,6 +55,7 @@ export default {
   .showcase {
     display: grid;
     grid-template-columns: 1fr 1fr;
+    gap: 2em;
   }
 
   .showcase:has(.left .cover) {

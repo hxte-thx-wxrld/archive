@@ -145,7 +145,7 @@ body {
   font-size: .75em;
 }*/
 body {
-  margin: 0;
+  margin: 1em;
 }
 
 a {

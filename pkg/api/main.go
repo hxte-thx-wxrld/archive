@@ -21,19 +21,8 @@ type ClientConfig struct {
 	S3Endpoint string
 }
 
-// Checks, if the request has given an id
-func IdChecker(ctx *gin.Context) {
-	objId := ctx.Param("id")
-	if objId == "" || objId == "undefined" || objId == "null" {
-		ctx.JSON(http.StatusBadRequest, errors.New("no id given"))
-	} else {
-		ctx.Next()
-	}
-}
-
-func InitApi(rg *gin.RouterGroup, db *pgxpool.Pool) {
-
-	rg.Use(func(ctx *gin.Context) {
+func DatabaseLogger(db *pgxpool.Pool) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
 		ctx.Next()
 		stats := db.Stat()
 		fmt.Println("Database Stats")
@@ -47,7 +36,22 @@ func InitApi(rg *gin.RouterGroup, db *pgxpool.Pool) {
 		fmt.Println("Max Conns:", stats.MaxConns())
 		fmt.Println("Total Conns:", stats.TotalConns())
 
-	})
+	}
+}
+
+// Checks, if the request has given an id
+func IdChecker(ctx *gin.Context) {
+	objId := ctx.Param("id")
+	if objId == "" || objId == "undefined" || objId == "null" {
+		ctx.JSON(http.StatusBadRequest, errors.New("no id given"))
+	} else {
+		ctx.Next()
+	}
+}
+
+func InitApi(rg *gin.RouterGroup, db *pgxpool.Pool) {
+
+	rg.Use(DatabaseLogger(db))
 	TrackApi(rg, db)
 	ArtistApi(rg, db)
 	ReleaseApi(rg, db)
